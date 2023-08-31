@@ -86,4 +86,13 @@ function auto_enroll_new_user( $user_id ) {
 }
 add_action( 'user_register', 'auto_enroll_new_user');
 
+/* make notify of new replies auto-checked */
+function notify_of_new_replies_by_default( $checked, $topic_subscribed ) {
+  if( $topic_subscribed == 0 )
+    $topic_subscribed = true;
+
+  return checked( $topic_subscribed, true, false );
+}
+add_filter( 'bbp_get_form_topic_subscribed', 'notify_of_new_replies_by_default', 10, 2 );
+
 ?>
