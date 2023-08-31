@@ -95,4 +95,6 @@ function notify_of_new_replies_by_default( $checked, $topic_subscribed ) {
 }
 add_filter( 'bbp_get_form_topic_subscribed', 'notify_of_new_replies_by_default', 10, 2 );
 
+add_action( 'bp_dd_create_forums_topics', 'bbp_add_user_topic_subscription' );
+
 ?>
