@@ -97,4 +97,15 @@ add_filter( 'bbp_get_form_topic_subscribed', 'notify_of_new_replies_by_default',
 
 add_action( 'bp_dd_create_forums_topics', 'bbp_add_user_topic_subscription' );
 
+/* hide wp login fields */
+function login_go_sso() { ?>
+  <style type="text/css">
+  .login-heading span { display: none; }
+  #user_label { display: none; }
+  #user_login { display: none; }
+  .user-pass-wrap { display: none; }
+  </style>
+<?php }
+add_action( 'login_enqueue_scripts', 'login_go_sso' );
+
 ?>
