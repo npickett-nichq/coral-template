@@ -214,6 +214,7 @@ class Boss_Follow_Us extends WP_Widget {
 		$youtube   = ( ! empty( $instance['youtube'] ) ) ? $instance['youtube'] : '';
 		$instagram = ( ! empty( $instance['instagram'] ) ) ? $instance['instagram'] : '';
 		$linkedin  = ( ! empty( $instance['linkedin'] ) ) ? $instance['linkedin'] : '';
+		$x         = ( ! empty( $instance['x'] ) ) ? $instance['x'] : '';
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
 		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
@@ -250,6 +251,10 @@ class Boss_Follow_Us extends WP_Widget {
 			echo '<a href="' . esc_url( $linkedin ) . '" target="_blank"><i class="bb-icon-bf bb-icon-brand-linkedin"></i></a>';
 		}
 
+		if ( ! empty( $x ) ) {
+			echo '<a href="' . esc_url( $x ) . '" target="_blank"><i class="bb-icon-bf bb-icon-brand-x"></i></a>';
+		}
+
 		echo '</div>';
 
 		echo $args['after_widget'];
@@ -275,6 +280,8 @@ class Boss_Follow_Us extends WP_Widget {
 		$instance['youtube']   = esc_url_raw( $new_instance['youtube'] );
 		$instance['instagram'] = esc_url_raw( $new_instance['instagram'] );
 		$instance['linkedin']  = esc_url_raw( $new_instance['linkedin'] );
+		$instance['x']         = esc_url_raw( $new_instance['x'] );
+
 		return $instance;
 	}
 
@@ -294,6 +301,8 @@ class Boss_Follow_Us extends WP_Widget {
 		$youtube   = isset( $instance['youtube'] ) ? esc_url( $instance['youtube'] ) : '';
 		$instagram = isset( $instance['instagram'] ) ? esc_url( $instance['instagram'] ) : '';
 		$linkedin  = isset( $instance['linkedin'] ) ? esc_url( $instance['linkedin'] ) : '';
+		$x         = isset( $instance['x'] ) ? esc_url( $instance['x'] ) : '';
+
 		?>
 		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'buddyboss-theme' ); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" /></p>
@@ -309,6 +318,10 @@ class Boss_Follow_Us extends WP_Widget {
 			<input class="widefat" id="<?php echo $this->get_field_id( 'instagram' ); ?>" name="<?php echo $this->get_field_name( 'instagram' ); ?>" type="url" value="<?php echo $instagram; ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id( 'linkedin' ); ?>"><?php _e( 'LinkedIn Link:', 'buddyboss-theme' ); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id( 'linkedin' ); ?>" name="<?php echo $this->get_field_name( 'linkedin' ); ?>" type="url" value="<?php echo $linkedin; ?>" /></p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'x' ); ?>"><?php _e( 'X Link:', 'buddyboss-theme' ); ?></label>
+			<input class="widefat" id="<?php echo $this->get_field_id( 'x' ); ?>" name="<?php echo $this->get_field_name( 'x' ); ?>" type="url" value="<?php echo $x; ?>" />
+		</p>
 		<?php
 	}
 

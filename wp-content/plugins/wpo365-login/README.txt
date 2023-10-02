@@ -2,8 +2,8 @@
 Contributors: wpo365
 Tags: office 365, O365, Microsoft 365, azure active directory, Azure AD, AAD, authentication, single sign-on, sso, SAML, SAML 2.0, OpenID Connect, OIDC, login, oauth, microsoft, microsoft graph, teams, microsoft teams, sharepoint online, sharepoint, spo, onedrive, SCIM, User synchronization, yammer, powerbi, power bi, mail, smtp, phpmailer, wp_mail, email
 Requires at least: 4.8.1
-Tested up to: 6.2
-Stable tag: 23.1
+Tested up to: 6.3
+Stable tag: 24.0
 Requires PHP: 5.6.40
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,7 +15,7 @@ With WPO365 | LOGIN users can sign in with their corporate or school (Azure AD /
 = SINGLE SIGN-ON (SSO) =
 
 - Enable Microsoft based Single Sign-on [more](https://www.wpo365.com/feature/single-sign-on/)
-- Supported Identity Providers (IdPs): **Azure Active Directory** and **Azure AD B2C** [more](https://docs.wpo365.com/article/158-select-identity-provider-idp)
+- Supported Identity Providers (IdPs): **Azure Active Directory**, **Azure AD B2C**, **Entra External ID (Azure AD for Customers)** [more](https://docs.wpo365.com/article/158-select-identity-provider-idp)
 - Supported SSO protocols: **OpenID Connect** and **SAML 2.0** [more](https://docs.wpo365.com/article/159-select-sso-protocol)
 - Supported OpenID Connect User Flows: Authorization Code User Flow (recommended) and Hybrid User Flow [more](https://docs.wpo365.com/article/156-why-the-authorization-code-user-flow-is-now-recommended)
 
@@ -75,6 +75,12 @@ https://youtu.be/6ti71O4nh0s
 
 [more](https://www.wpo365.com/feature/custom-user-fields/)
 
+= NEW USERS =
+
+- Create users in **Azure AD B2C / Entra External ID (Azure AD for Customers)** from WordPress 
+
+[more](https://docs.wpo365.com/article/185-create-users-in-azure-ad-b2c-from-wordpress)
+
 = SINGLE SIGN-ON =
 
 - Visitors are required to sign in with Azure AD / Microsoft but will not be automatically logged in to WordPress 
@@ -83,27 +89,29 @@ https://youtu.be/6ti71O4nh0s
 
 = AUDIENCES =
 
-- Azure AD group based **access restriction** for individual front-end posts and pages 
+- Azure AD group based **access restriction** for individual front-end posts and pages and post types 
+- Require a user to log on (and determine the response e.g. redirect to 404, the login page or for Microsoft based SSO)
 
 [more](https://www.wpo365.com/feature/audiences/)
 
 = SYNC =
 
-- On-demand / scheduled **user synchronization** from Azure AD to WordPress 
+- On-demand / scheduled **user synchronization** from Azure AD (B2C) to WordPress 
+- On-demand / scheduled **user synchronization** from WordPress to Azure AD B2C / Entra External ID (Azure AD for Customers)
 
 [more](https://www.wpo365.com/feature/user-synchronization/)
+
+= ROLES + ACCESS =
+
+- WordPress roles assignments / access restrictions based on *Azure AD groups* / user attributes / login-domains 
+
+[more](https://www.wpo365.com/feature/roles-access/)
 
 = AVATAR =
 
 - Replace the default WordPress / BuddyPress **avatar** with a Microsoft 365 profile picture
 
 [more](https://www.wpo365.com/feature/avatar/)
-
-= ROLES + ACCESS =
-
-- WordPress roles assignments / access restrictions based on *Azure AD groups* / user attributes 
-
-[more](https://www.wpo365.com/feature/roles-access/)
 
 = LOGIN+ =
 
@@ -112,27 +120,34 @@ https://youtu.be/6ti71O4nh0s
 - Map **custom claims** from SAML 2.0 response to custom WordPress / BuddyPress user profile fields
 - Support for so-called **Multi-Tenancy**
 - Require **Proof Key for Code Exchange (PKCE)**
-- Enable SSO for the login page
+- Force Single Sign-on for the login page
 - Dual login
-- Private pages
 
 [more](https://www.wpo365.com/feature/advanced-login-options/)
+
+= LEARNDASH INTEGRATION =
+
+- Auto-enroll users into **LearnDash** Courses e.g. based on their *Azure AD groups* memberships.
+- Support for LearnDash User Groups.
+
+[more](https://docs.wpo365.com/article/184-learndash-integration)
 
 = MAIL =
 
 - Send **large attachments** (> 3 Mb)
 - Send from **Microsoft 365 Shared Mailbox**
 - Send as / Send on behalf / Support for distribution lists
-- **Log every email** sent from your WordPress website, review errors and try to send unsuccessfully sent mails again.
+- **Log every email** sent from your WordPress website, review errors and (automatically) try to send unsuccessfully sent mails again.
+- **Throttle** emails send from your website.
 - **Mail Staging Mode** is useful for debugging and staging environments. WordPress emails will be logged and saved in the database instead of being sent.
 - Allow forms / plugins / themes to dynamically set the **From** address
 - Send all emails by default as BCC
 
-[more]https://www.wpo365.com/feature/send-mail-using-ms-graph/
+[more](https://www.wpo365.com/feature/send-mail-using-ms-graph/)
 
 = GROUPS =
 
-- Deep integration with the **(itthinx) Groups** plugin for group membership and access control 
+- Deep integration with the **(itthinx) Groups** plugin for group membership and access control
 
 [more](https://www.wpo365.com/downloads/wpo365-groups/)
 
@@ -172,7 +187,7 @@ We will go to great length trying to support you if the plugin doesn't work as e
 
 == Feedback ==
 
-We are keen to hear from you so share your feedback with us on [Twitter](https://twitter.com/WPO365) and help us get better!
+We are keen to hear from you so share your feedback with us on [LinkedIn](https://www.linkedin.com/company/downloads-by-van-wieren) and help us get better!
 
 == Open Source ==
 
@@ -201,6 +216,35 @@ Please refer to [these **Getting started** articles](https://docs.wpo365.com/cat
 * Please check the online version of the [release notes for version 11.0](https://www.wpo365.com/release-notes-v11-0/).
 
 == Changelog ==
+
+= v24.0 =
+* Breaking change: Testing the User synchronization query no longer requires the WPO365 REST API for Microsoft Graph to be enabled. Administrators, however, must update both WPO365 | LOGIN and the premium extension / bundle or else they cannot test the query. If the user sync query remains unchanged, it is no longer needed to test the query again. [SYNC, INTRANET, CUSTOMERS]
+* Deprecated: Administrators can not add new *Private pages* to the corresponding list on the plugin's *Authentication* configuration page anymore. Instead they must enable and configure the **Audiences** feature, which provide a more robust option to mark pages or post types as private i.e. to require a user to log in first. See the [online documentation](https://docs.wpo365.com/article/139-audiences) for details. [LOGIN+, ROLES + ACCESS, SYNC, INTRANET]
+* Deprecated: The ability to exclude post types from the **Audiences** feature has been removed. [ROLES + ACCESS, SYNC, INTRANET]
+* Feature: Support for **LearnDash** integration, for example to auto-enroll users into courses or allocate users to LD User Groups based on a user's Azure AD group membership(s) or just whenever WPO365 creates a new WordPress user. See the [online documentation](https://docs.wpo365.com/article/184-learndash-integration) for details. [ROLES + ACCESS, SYNC, INTRANET]
+* Feature: WPO365 now supports **Entra External ID (Azure AD for Customers)** and this support has been streamlined with the already built-in support for **Azure AD B2C**. [LOGIN+, SYNC, INTRANET, CUSTOMERS] Check out our [online documentation](https://www.wpo365.com/feature/microsoft-entra-external-id/)
+* Feature: **(Auto-) Register new WordPress users in Azure AD B2C / Entra External ID (Azure AD for Customers)** and update existing ones (including support for custom user attributes / claims). See the [online documentation](https://docs.wpo365.com/article/185-create-users-in-azure-ad-b2c-from-wordpress) for details. [SYNC, INTRANET, CUSTOMERS]
+* Feature: **Synchronize users from WordPress to Azure AD B2C / Entra External ID (Azure AD for Customers)** (including support for custom user attributes). See the [online documentation](https://docs.wpo365.com/article/186-synchronize-users-from-wordpress-to-azure-ad-b2c) for details. [SYNC, INTRANET, CUSTOMERS]
+* Feature: **(Auto-) Retry sending failed emails** using Microsoft Graph. See the [online documentation](https://docs.wpo365.com/article/183-resending-failed-emails-automatically) for details. [MAIL]
+* Feature: **Throttle nr. of emails send per minute** using Microsoft Graph. See the [online documentation](https://docs.wpo365.com/article/182-throttle-the-number-of-emails-sent-per-minute) for details. [MAIL]
+* Feature: **Audiences** can now be configured to restrict viewing posts of a specific type to members of an audience. See the [online documentation](https://docs.wpo365.com/article/196-audience-based-restrictions-for-a-post-type) for details. [ROLES + ACCESS, SYNC, INTRANET]
+* Feature: **Audiences** now allows administrators to require users to log in to view posts of a specific type and where a visitor will be redirected to e.g. the 404 Not Found page, the site's login page or Microsoft's login page. See the [online documentation](https://docs.wpo365.com/article/197-post-types-that-require-a-logged-in-user) for details. [ROLES + ACCESS, SYNC, INTRANET]
+* Improvement: Most of the features that WPO365 | CUSTOM USER FIELDS unlocks are now also unlocked by WPO365 | ROLES + ACCESS to allow for Azure-AD-user-attribute based rules. [ROLES + ACCESS, CUSTOM USER FIELDS]
+* Improvement: Optional claims and attributes added to an JWT OIDC ID token can now also be mapped to WordPress custom user fields. See the [online documentation](xxx) for details. [LOGIN+, SYNC, INTRANET]
+* Improvement: Administrators can now select a (custom) claim from the ID token or the SAML response that WPO365 should be using to create a new WordPress user's username. See the [updated documentation](https://docs.wpo365.com/article/187-username-preference) for details. [LOGIN+, SYNC, INTRANET]
+* Improvement: Developers can now skip the removal of specific roles when WPO365 is configured to "Replace" user roles by utilizing the new "wpo365/roles/remove" filter. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [ROLES + ACCESS, SYNC, INTRANET]
+* Improvement: Developers can now add a filter for the Azure AD Redirect URI e.g. to set it dynamically to the current host. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [LOGIN]
+* Improvement: The WPO365 | MAIL premium addon now also unlocks the option to use WP-Config.php to override (some) config options. Now administrators can - for example on their staging environment - enable mail-staging mode, simply by adding a global constant to the WP-Config.php file. See the [updated documentation](). [MAIL]
+* Improvement: Developers can now skip the URL check that WPO365 conducts just before it redirects a user to its final destination by hooking into a new filter wpo365/url_check/skip. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [LOGIN]
+* Improvement: Administrators can now configure WPO365 user synchronization to only send mail notifications when a job did not complete successfully. [SYNC, INTRANET]
+* Improvement: Administrators now can bulk-reactivate users that have been deactivated previously by WPO365. [SYNC, INTRANET, CUSTOMERS]
+* Improvement: When a user is reactivated, the role will be set to the default role for the main (or sub) site as per WPO365 configuration. [SYNC, INTRANET, CUSTOMERS]
+* Improvement: Blocking password reset and email change has been made available for Azure AD B2C / Entra External ID (Azure AD for Customers). [LOGIN+, SYNC, INTRANET]
+* Fix: WPO365 will now match custom WordPress roles in a case-insensitive matter. [ROLES + ACCESS, SYNC, INTRANET]
+* Fix: WPO365 will now retrieve a user's Azure AD group memberships from Microsoft Graph if the administrator checked the option to include Microsoft 365 group memberships, even if the ID token already carries information on group memberships. [ROLES + ACCESS, SYNC, INTRANET]
+* Fix: When you schedule a WPO365 User synchronization job for a specific hour of the day, it will now translate the time from UTC to the admin's timezone and not wrongly add the current minutes of the hour passed. [SYNC, INTRANET, CUSTOMERS]
+* Fix: WPO365 now caches the access token with an audience property (= the requesting application (client) ID) to prevent access tokens for mail and for other Microsoft 365 services getting mixed up / from being overwritten. [LOGIN]
+* Fix: Tested with PHP 8.2. [ALL]
 
 = v23.1 =
 * Fix: The plugin update checker did not always return the expected result. [LOGIN, MS GRAPH MAILER]

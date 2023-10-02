@@ -20,20 +20,6 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 	class BP_Zoom_Conference_Api {
 
 		/**
-		 * Zoom API Key
-		 *
-		 * @var string
-		 */
-		public $zoom_api_key;
-
-		/**
-		 * Zoom API Secret
-		 *
-		 * @var string
-		 */
-		public $zoom_api_secret;
-
-		/**
 		 * Instance of BP_Zoom_Conference_Api
 		 *
 		 * @var object
@@ -74,13 +60,6 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 		 * @var string
 		 */
 		public $zoom_api_client_secret;
-
-		/**
-		 * Zoom API JWT Auth Type.
-		 *
-		 * @var bool
-		 */
-		public static $is_jwt_auth;
 
 		/**
 		 * Zoom meeting SDK Client ID.
@@ -126,12 +105,14 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 		/**
 		 * BP_Zoom_Conference_Api constructor.
 		 *
-		 * @param string $zoom_api_key    Zoom API Key.
-		 * @param string $zoom_api_secret Zoom API Secret.
+		 * @param string $account_id    Zoom account ID.
+		 * @param string $client_id     Zoom API client ID.
+		 * @param string $client_secret Zoom client secret.
 		 */
-		public function __construct( $zoom_api_key = '', $zoom_api_secret = '' ) {
-			$this->zoom_api_key    = $zoom_api_key;
-			$this->zoom_api_secret = $zoom_api_secret;
+		public function __construct( $account_id = '', $client_id = '', $client_secret = '' ) {
+			$this->zoom_api_account_id    = $account_id;
+			$this->zoom_api_client_id     = $client_id;
+			$this->zoom_api_client_secret = $client_secret;
 		}
 
 		/**
@@ -146,11 +127,7 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 		protected function send_request( $called_function, $data, $request = 'GET' ) {
 			$request_url = $this->api_url . $called_function;
 
-			if ( self::$is_jwt_auth ) {
-				$token = $this->generate_jwt_key();
-			} else {
-				$token = $this->get_access_token( $this->zoom_api_account_id, $this->zoom_api_client_id, $this->zoom_api_client_secret, self::$group_id );
-			}
+			$token = $this->get_access_token( $this->zoom_api_account_id, $this->zoom_api_client_id, $this->zoom_api_client_secret, self::$group_id );
 
 			$args = array(
 				'headers' => array(
@@ -180,25 +157,15 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 			$response      = wp_remote_retrieve_body( $response );
 			$response_body = in_array( $response_code, array( 400, 401 ), true ) && $this->is_xml( $response ) ? simplexml_load_string( $response ) : json_decode( $response );
 			if ( self::$is_validate && in_array( $response_code, array( 400, 401 ), true ) ) {
-				if ( self::$is_jwt_auth ) {
-					$this->validate_jwt_settings(
-						array(
-							'zoom_api_key'    => $this->zoom_api_key,
-							'zoom_api_secret' => $this->zoom_api_secret,
-							'group_id'        => self::$group_id,
-						)
-					);
-				} else {
-					$this->validate_s2s_settings(
-						array(
-							'account_id'    => $this->zoom_api_account_id,
-							'client_id'     => $this->zoom_api_client_id,
-							'client_secret' => $this->zoom_api_client_secret,
-							'response'      => $response,
-							'group_id'      => self::$group_id,
-						)
-					);
-				}
+				$this->validate_s2s_settings(
+					array(
+						'account_id'    => $this->zoom_api_account_id,
+						'client_id'     => $this->zoom_api_client_id,
+						'client_secret' => $this->zoom_api_client_secret,
+						'response'      => $response,
+						'group_id'      => self::$group_id,
+					)
+				);
 			}
 
 			// Reset the variable.
@@ -209,24 +176,6 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 				'code'     => $response_code,
 				'body'     => $response_body,
 			);
-		}
-
-		/**
-		 * Generate JWT Key
-		 *
-		 * @since 1.0.0
-		 * @return string JWT key
-		 */
-		public function generate_jwt_key() {
-			$key    = $this->zoom_api_key;
-			$secret = $this->zoom_api_secret;
-
-			$token = array(
-				'iss' => $key,
-				'exp' => time() + 3600, // 60 seconds as suggested
-			);
-
-			return JWT::encode( $token, $secret );
 		}
 
 		/**
@@ -1015,7 +964,7 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 				$sdk_secret_key = $this->zoom_meeting_sdk_client_secret;
 			}
 
-			if ( empty( $sdk_secret_key ) ) {
+			if ( empty( $sdk_client_key ) || empty( $sdk_secret_key ) ) {
 				return false;
 			}
 
@@ -1126,59 +1075,6 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 		}
 
 		/**
-		 * Validate the JWT credential when updated the settings from the Zoom account.
-		 *
-		 * @since 2.3.91
-		 *
-		 * @param array $args Array of JWT credentials.
-		 */
-		private function validate_jwt_settings( $args = array() ) {
-			$settings = bp_parse_args(
-				$args,
-				array(
-					'zoom_api_key'    => $this->zoom_api_key,
-					'zoom_api_secret' => $this->zoom_api_secret,
-					'group_id'        => self::$group_id,
-				)
-			);
-
-			$account_email = ( ! empty( $settings['group_id'] ) ) ? groups_get_groupmeta( $settings['group_id'], 'bp-group-zoom-api-email' ) : bp_get_option( 'bp-zoom-api-email' );
-
-			if ( ! empty( $account_email ) ) {
-
-				// Do not validate again and avoid going to infinite loop.
-				self::$is_validate = false;
-
-				bp_zoom_conference()->zoom_api_key    = $settings['zoom_api_key'];
-				bp_zoom_conference()->zoom_api_secret = $settings['zoom_api_secret'];
-				self::$is_jwt_auth                    = true;
-				self::$group_id                       = $settings['group_id'];
-
-				// Get user information to validate JWT.
-				$user_info = $this->get_user_info( $account_email );
-				if ( 200 !== $user_info['code'] ) {
-					$errors[] = ( ! empty( $user_info['response']->message ) ) ? new WP_Error( 'api_error', $user_info['response']->message ) : new WP_Error( 'api_error', __( 'Invalid credentials.', 'buddyboss-pro' ) );
-
-					if ( ! empty( $settings['group_id'] ) ) {
-						groups_update_groupmeta( $settings['group_id'], 'bp-group-zoom-api-errors', $errors );
-						groups_update_groupmeta( $settings['group_id'], 'bp-group-zoom-api-is-connected', false );
-						groups_delete_groupmeta( $settings['group_id'], 'bp-group-zoom-api-host' );
-						groups_delete_groupmeta( $settings['group_id'], 'bp-group-zoom-api-host-user' );
-						groups_delete_groupmeta( $settings['group_id'], 'bp-group-zoom-api-host-user-settings' );
-						groups_delete_groupmeta( $settings['group_id'], 'bp-group-zoom-enable-webinar' );
-					} else {
-						bp_update_option( 'bp-zoom-api-errors', $errors );
-						bp_update_option( 'bp-zoom-api-is-connected', false );
-						bp_delete_option( 'bp-zoom-api-host' );
-						bp_delete_option( 'bp-zoom-api-host-user' );
-						bp_delete_option( 'bp-zoom-api-host-user-settings' );
-						bp_delete_option( 'bp-zoom-enable-webinar' );
-					}
-				}
-			}
-		}
-
-		/**
 		 * Zoom webhook handler for blocks and groups.
 		 *
 		 * @since 2.3.91
@@ -1209,7 +1105,7 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 					if ( 'site' === $connection_type ) {
 						$group_token = bb_zoom_secret_token();
 					} else {
-						$group_token = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-webhook-token' );
+						$group_token = groups_get_groupmeta( $group_id, 'bb-group-zoom-s2s-secret-token' );
 					}
 				}
 
@@ -2021,10 +1917,5 @@ if ( ! class_exists( 'BP_Zoom_Conference_Api' ) ) {
 		bp_zoom_conference()->zoom_api_account_id    = bb_zoom_account_id();
 		bp_zoom_conference()->zoom_api_client_id     = bb_zoom_client_id();
 		bp_zoom_conference()->zoom_api_client_secret = bb_zoom_client_secret();
-		BP_Zoom_Conference_Api::$is_jwt_auth         = false;
-	} elseif ( bb_zoom_is_jwt_connected() ) {
-		bp_zoom_conference()->zoom_api_key    = bp_zoom_api_key();
-		bp_zoom_conference()->zoom_api_secret = bp_zoom_api_secret();
-		BP_Zoom_Conference_Api::$is_jwt_auth  = true;
 	}
 }

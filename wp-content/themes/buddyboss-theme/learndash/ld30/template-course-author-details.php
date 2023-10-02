@@ -4,6 +4,9 @@ global $post;
 if ( 'sfwd-courses' != $post->post_type ) {
 	return;
 }
+
+global $bb_ld_heading_level_3;
+
 $course = $post;
 ?>
 
@@ -12,7 +15,19 @@ $course = $post;
     <?php if( buddyboss_theme_get_option('learndash_course_author') ) { ?>
 	<?php $is_author_info = (buddyboss_theme_get_option('learndash_course_author_info')) ? 'bb-about-instructor--is-info' : 'bb-about-instructor--no-info'; ?>
 	<div class="bb-about-instructor <?php echo $is_author_info; ?>">
-		<h4><?php _e( 'About Instructor', 'buddyboss-theme' ); ?></h4>
+		<?php
+		if ( empty( $bb_ld_heading_level_3 ) ) {
+			$bb_ld_heading_level_3 = true;
+			?>
+            <h3 class="bb-instructor-heading"><?php _e( 'About Instructor', 'buddyboss-theme' ); ?></h3>
+			<?php
+		} else {
+			?>
+            <h4 class="bb-instructor-heading"><?php _e( 'About Instructor', 'buddyboss-theme' ); ?></h4>
+			<?php
+		}
+		?>
+
 		<div class="bb-grid">
             <div class="bb-instructor-wrap flex">
                 <div class="bb-avatar-wrap">

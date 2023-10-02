@@ -282,10 +282,7 @@ $meeting_date_unix = $meeting_date_obj->format( 'U' );
 			?>
 			<div class="meeting-actions">
 				<?php
-				if (
-					bb_zoom_group_show_join_browser_button( bp_get_zoom_meeting_group_id() ) &&
-					! empty( $browser_credential['sign'] )
-				) {
+				if ( ! empty( $browser_credential['sign'] ) ) {
 					?>
 					<a href="#" class="button small outline join-meeting-in-browser" data-meeting-id="<?php bp_zoom_meeting_zoom_meeting_id(); ?>" data-meeting-pwd="<?php bp_zoom_meeting_password(); ?>" data-is-host="<?php echo bp_zoom_can_current_user_start_meeting( bp_get_zoom_meeting_id() ) ? esc_attr( '1' ) : esc_attr( '0' ); ?>" data-meeting-sign="<?php echo esc_attr( $browser_credential['sign'] ); ?>" data-meeting-sdk="<?php echo esc_attr( $browser_credential['sdk_client_id'] ); ?>">
 					<?php if ( bp_zoom_can_current_user_start_meeting( bp_get_zoom_meeting_id() ) ) : ?>

@@ -51,12 +51,14 @@ if (!class_exists('\Wpo\Services\Nonce_Service')) {
             $nonce_stack = Wpmu_Helpers::mu_get_transient('wpo365_nonces');
 
             if (empty($nonce_stack)) {
+                Log_Service::write_log('WARN', sprintf('%s -> Empty nonce stack', __METHOD__));
                 return false;
             }
 
             $index = array_search($nonce, $nonce_stack);
 
             if (false === $index) {
+                Log_Service::write_log('WARN', sprintf('%s -> Nonce %s not found %s', __METHOD__, $nonce, json_encode($nonce_stack)));
                 return false;
             }
 

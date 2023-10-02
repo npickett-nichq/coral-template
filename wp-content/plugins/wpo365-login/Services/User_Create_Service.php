@@ -67,9 +67,12 @@ if (!class_exists('\Wpo\Services\User_Create_Service')) {
                 $password_length = 16;
             }
 
+            $password = wp_generate_password($password_length, true, false);
+            $password = wp_hash_password($password);
+
             $userdata = array(
                 'user_login'    => $user_login,
-                'user_pass'     => wp_generate_password($password_length, true, false),
+                'user_pass'     => $password,
                 'role'          => $usr_default_role,
             );
 
@@ -88,8 +91,17 @@ if (!class_exists('\Wpo\Services\User_Create_Service')) {
                 unset($GLOBALS['wp_filter']['user_register']);
             }
 
-            // Insert in Wordpress DB
+            $existing_registering = remove_filter('wp_pre_insert_user_data', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registering', PHP_INT_MAX);
+            $existing_registered = remove_action('user_registered', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registered', PHP_INT_MAX);
             $wp_usr_id = wp_insert_user($userdata);
+
+            if ($existing_registering) {
+                add_filter('wp_pre_insert_user_data', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registering', PHP_INT_MAX, 4);
+            }
+
+            if ($existing_registered) {
+                add_action('user_register', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registered', PHP_INT_MAX, 1);
+            }
 
             if (!empty($GLOBALS['wp_filter']) && !empty($user_regiser_hooks)) {
                 $GLOBALS['wp_filter']['user_register'] = $user_regiser_hooks;
@@ -113,19 +125,9 @@ if (!class_exists('\Wpo\Services\User_Create_Service')) {
 
             self::wpmu_add_user_to_blog($wp_usr_id, $user_login);
 
-            // Try and send new user email
-            if (\class_exists('\Wpo\Services\Mail_Notifications_Service')) {
-
-                if (Options_Service::get_global_boolean_var('new_usr_send_mail')) {
-                    $notify = Options_Service::get_global_boolean_var('new_usr_send_mail_admin_only')
-                        ? 'admin'
-                        : 'both';
-                    \Wpo\Services\Mail_Notifications_Service::new_user_notification($wp_usr_id, null, $notify);
-                    Log_Service::write_log('DEBUG', __METHOD__ . ' -> Sent new user notification');
-                }
-            } else {
-                Log_Service::write_log('DEBUG', __METHOD__ . ' -> Did not sent new user notification');
-            }
+            add_filter('allow_password_reset', '\Wpo\Services\User_Create_Service::temporarily_allow_password_reset', PHP_INT_MAX, 1);
+            wp_new_user_notification($wp_usr_id, null, 'both');
+            remove_filter('allow_password_reset', '\Wpo\Services\User_Create_Service::temporarily_allow_password_reset', PHP_INT_MAX);
 
             Wpmu_Helpers::mu_delete_transient('wpo365_upgrade_dismissed');
             Wpmu_Helpers::mu_set_transient('wpo365_user_created', date('d'), 1209600);
@@ -195,6 +197,18 @@ if (!class_exists('\Wpo\Services\User_Create_Service')) {
             } else {
                 Log_Service::write_log('WARN', __METHOD__ . ' -> Could not add user ' . $preferred_user_name . ' to current blog with ID ' . $blog_id . ' because the default role for the subsite is not valid');
             }
+        }
+
+        /**
+         * Helper used to temporarily add as a filter for 'allow_password_reset' when sending a new user email.
+         * 
+         * @since   24.0
+         * 
+         * @return  true 
+         */
+        public static function temporarily_allow_password_reset()
+        {
+            return true;
         }
     }
 }

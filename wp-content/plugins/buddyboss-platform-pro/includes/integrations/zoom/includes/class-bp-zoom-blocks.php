@@ -161,8 +161,8 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 			}
 
 			$host_user_type  = 1;
-			$default_host_id = bb_zoom_get_account_email();
-			$api_host_user   = bb_zoom_get_api_host_user();
+			$default_host_id = bb_zoom_account_email();
+			$api_host_user   = bb_zoom_get_host_user();
 
 			if ( ! empty( $api_host_user ) && 2 === (int) $api_host_user->type ) {
 				$host_user_type = 2;
@@ -345,13 +345,11 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 			$meeting_id            = $attributes['meetingId'];
 			$bp_zoom_meeting_block = bb_zoom_get_meeting_block( $meeting_id, true );
 
-			if ( ! empty( $bp_zoom_meeting_block ) ) {
-				if ( empty( $bp_zoom_meeting_block ) ) {
-					return $content;
-				}
-
-				$bp_zoom_meeting_block->block_class_name = isset( $attributes['className'] ) ? $attributes['className'] : '';
+			if ( empty( $bp_zoom_meeting_block ) ) {
+				return $content;
 			}
+
+			$bp_zoom_meeting_block->block_class_name = $attributes['className'] ?? '';
 
 			ob_start();
 			bp_get_template_part( 'zoom/blocks/meeting-block' );
@@ -411,7 +409,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -464,7 +462,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -524,7 +522,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -607,7 +605,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( $response_error );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -905,13 +903,11 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 			$webinar_id            = $attributes['webinarId'];
 			$bp_zoom_webinar_block = bb_zoom_get_webinar_block( $webinar_id );
 
-			if ( ! empty( $bp_zoom_webinar_block ) ) {
-				if ( empty( $bp_zoom_webinar_block ) ) {
-					return $content;
-				}
-
-				$bp_zoom_webinar_block->block_class_name = isset( $attributes['className'] ) ? $attributes['className'] : '';
+			if ( empty( $bp_zoom_webinar_block ) ) {
+				return $content;
 			}
+
+			$bp_zoom_webinar_block->block_class_name = $attributes['className'] ?? '';
 
 			ob_start();
 			bp_get_template_part( 'zoom/blocks/webinar-block' );
@@ -971,7 +967,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -1023,7 +1019,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -1082,7 +1078,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( array( 'error' => __( 'Something went wrong. If passcode is entered then please make sure it matches Zoom Passcode requirements and try again.', 'buddyboss-pro' ) ) );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {
@@ -1162,7 +1158,7 @@ if ( ! class_exists( 'BP_Zoom_Blocks' ) ) {
 				wp_send_json_error( $response_error );
 			}
 
-			$host_id = bb_zoom_get_account_email();
+			$host_id = bb_zoom_account_email();
 
 			// check user host.
 			if ( empty( $host_id ) ) {

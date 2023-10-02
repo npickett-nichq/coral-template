@@ -314,10 +314,7 @@
 			<div class="meeting-item-col meeting-action last-col full text-right <?php echo ( 'started' === bp_get_zoom_meeting_current_status() || ( $show_join_meeting_button && $current_date < $meeting_date_unix ) ) ? '' : 'bp-hide'; ?>">
 
 				<?php
-				if (
-					bb_zoom_group_show_join_browser_button( bp_get_current_group_id() ) &&
-					! empty( $browser_credential['sign'] )
-				) {
+				if ( ! empty( $browser_credential['sign'] ) ) {
 					?>
 					<a href="#" data-meeting-id="<?php echo esc_attr( bp_get_zoom_meeting_zoom_meeting_id() ); ?>"
 					data-meeting-pwd="<?php echo esc_attr( bp_get_zoom_meeting_password() ); ?>"

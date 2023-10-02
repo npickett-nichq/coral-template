@@ -40,6 +40,15 @@ if (!class_exists('\Wpo\Core\User')) {
         public $preferred_username = '';
 
         /**
+         * Custom claim used as Username
+         * 
+         * @since 24.0
+         * 
+         * @var string
+         */
+        public $custom_username = '';
+
+        /**
          * Name of user
          *
          * @since 1.0.0

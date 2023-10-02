@@ -233,7 +233,7 @@
 			$( '#object-nav > ul' ).BossSocialMenu( 35 );
 			$( '.bb-footer ul.footer-menu' ).BossSocialMenu( 90 );
 			$( '.bp-navs ul.component-navigation:not(.search-nav)' ).BossSocialMenu( 35 );
-			$( '.bb-profile-grid.bb-grid .bp-navs ul.subnav' ).BossSocialMenu( 90 );
+			$( '.bb-profile-grid.bb-grid .bp-navs.user-subnav ul.subnav' ).BossSocialMenu( 90 );
 			if ( $( '#object-nav > ul' ).length > 0 ) {
 				setTimeout( function () {
 					window.dispatchEvent(new Event('resize'));

@@ -251,7 +251,7 @@ if ( ! class_exists( '\BuddyBossTheme\BaseTheme' ) ) {
 		 */
 		private function _setup_globals() {
 
-			$this->bb_theme_db_version     = 435;
+			$this->bb_theme_db_version     = 445;
 			$this->bb_theme_db_version_raw = (int) get_option( '_bb_theme_db_version' );
 
 			// Get theme path.

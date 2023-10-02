@@ -86,15 +86,19 @@ if (!class_exists('\Wpo\Services\Saml2_Service')) {
          */
         public static function saml_settings($validate = false)
         {
-
             $base_url = Options_Service::get_global_string_var('saml_base_url');
             $sp_entity_id = Options_Service::get_global_string_var('saml_sp_entity_id');
-            $sp_acs_url = Options_Service::get_global_string_var('saml_sp_acs_url');
             $sp_sls_url = Options_Service::get_global_string_var('saml_sp_sls_url');
             $idp_entity_id = Options_Service::get_global_string_var('saml_idp_entity_id');
             $idp_ssos_url = Options_Service::get_global_string_var('saml_idp_ssos_url');
             $idp_sls_url = Options_Service::get_global_string_var('saml_idp_sls_url');
             $x509cert = Options_Service::get_aad_option('saml_x509_cert');
+            $sp_acs_url = Options_Service::get_global_string_var('saml_sp_acs_url');
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+            $sp_acs_url = apply_filters('wpo365/aad/redirect_uri', $sp_acs_url);
 
             $log_level = $validate ? 'WARN' : 'ERROR';
             $has_errors = false;

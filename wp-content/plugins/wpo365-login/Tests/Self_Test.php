@@ -51,12 +51,15 @@ if (!class_exists('\Wpo\Tests\Self_Test')) {
             $no_sso = Options_Service::get_global_boolean_var('no_sso');
             $use_saml = Options_Service::get_global_boolean_var('use_saml');
             $use_b2c = Options_Service::get_global_boolean_var('use_b2c');
+            $use_ciam = Options_Service::get_global_boolean_var('use_ciam');
             $oidc_flow = Options_Service::get_global_string_var('oidc_flow');
 
             if (!$no_sso) {
                 if ($use_saml) {
                     $test_sets[] = new Test_Saml2();
                 } elseif ($use_b2c) {
+                    $test_sets[] = new Test_B2c();
+                } elseif ($use_ciam) {
                     $test_sets[] = new Test_B2c();
                 } else {
                     $test_sets[] = new Test_OpenId_Connect();
@@ -68,6 +71,8 @@ if (!class_exists('\Wpo\Tests\Self_Test')) {
 
                 if ($use_b2c && class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
                     \Wpo\Services\Id_Token_Service_B2c::process_openidconnect_code();
+                } else if ($use_ciam && class_exists('\Wpo\Services\Id_Token_Service_Ciam')) {
+                    \Wpo\Services\Id_Token_Service_Ciam::process_openidconnect_code();
                 } else {
                     \Wpo\Services\Id_Token_Service::process_openidconnect_code();
                 }

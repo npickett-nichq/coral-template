@@ -43,7 +43,7 @@ if ( is_user_logged_in() ) {
 	$current_userdata = get_userdata( get_current_user_id() );
 
 	if ( ! empty( $current_userdata ) ) {
-		$api_email = bb_zoom_get_account_email();
+		$api_email = bb_zoom_account_email();
 		if ( $api_email === $current_userdata->user_email ) {
 			$can_start_meeting = true;
 		} elseif ( in_array( $current_userdata->user_email, explode( ',', $alt_hosts ), true ) ) {
@@ -73,22 +73,16 @@ $role           = $can_start_meeting ? 1 : 0; // phpcs:ignore
 
 $api_key       = '';
 $api_secret    = '';
-$sdk_type      = '';
 $sdk_client_id = '';
 $sign          = '';
 if ( bb_zoom_is_meeting_sdk() ) {
 	$api_key       = bb_zoom_sdk_client_id();
 	$api_secret    = bb_zoom_sdk_client_secret();
-	$sdk_type      = 'SDK';
 	$sdk_client_id = $api_key;
-} elseif ( bb_zoom_is_jwt_connected() ) {
-	$api_key    = bp_zoom_api_key();
-	$api_secret = bp_zoom_api_secret();
-	$sdk_type   = 'JWT';
 }
 
-if ( ! empty( $api_key ) && ! empty( $api_secret ) && ! empty( $sdk_type ) ) {
-	$sign = bb_get_meeting_signature( $api_key, $api_secret, $meeting_number, $role, $sdk_type );
+if ( ! empty( $api_key ) && ! empty( $api_secret ) && ! empty( $meeting_number ) ) {
+	$sign = bb_get_meeting_signature( $api_key, $api_secret, $meeting_number, $role );
 }
 
 $meeting_date_raw   = false;

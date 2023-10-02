@@ -38,8 +38,14 @@ if (!class_exists('\Wpo\Services\Id_Token_Service')) {
             $application_id = Options_Service::get_aad_option('application_id');
             $directory_id = Options_Service::get_aad_option('tenant_id');
             $oidc_flow = Options_Service::get_global_string_var('oidc_flow');
-            $redirect_url = Options_Service::get_aad_option('redirect_url');
             $multi_tenanted = Options_Service::get_global_boolean_var('multi_tenanted') && !Options_Service::get_global_boolean_var('use_b2c');
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            $redirect_uri = Options_Service::get_aad_option('redirect_url');
+            $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
 
             $redirect_to = !empty($redirect_to)
                 ? $redirect_to
@@ -67,7 +73,7 @@ if (!class_exists('\Wpo\Services\Id_Token_Service')) {
 
             $params = array(
                 'client_id'             => $application_id,
-                'redirect_uri'          => $redirect_url,
+                'redirect_uri'          => $redirect_uri,
                 'response_mode'         => 'form_post',
                 'scope'                 => $scope,
                 'state'                 => $redirect_to,
@@ -206,8 +212,18 @@ if (!class_exists('\Wpo\Services\Id_Token_Service')) {
             $directory_id = $use_mail_config ? Options_Service::get_aad_option('mail_tenant_id') : Options_Service::get_aad_option('tenant_id');
             $application_id = $use_mail_config ? Options_Service::get_aad_option('mail_application_id') : Options_Service::get_aad_option('application_id');
             $application_secret = $use_mail_config ? Options_Service::get_aad_option('mail_application_secret') : Options_Service::get_aad_option('application_secret');
-            $redirect_url = $use_mail_config ? Options_Service::get_aad_option('mail_redirect_url') : Options_Service::get_aad_option('redirect_url');
-            $multi_tenanted = Options_Service::get_global_boolean_var('multi_tenanted') && !Options_Service::get_global_boolean_var('use_b2c');
+            $multi_tenanted = Options_Service::get_global_boolean_var('multi_tenanted') && !$use_mail_config && !Options_Service::get_global_boolean_var('use_b2c');
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            if ($use_mail_config) {
+                $redirect_uri = Options_Service::get_aad_option('mail_redirect_url');
+            } else {
+                $redirect_uri = Options_Service::get_aad_option('redirect_url');
+                $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
+            }
 
             if (true === $multi_tenanted) {
                 $directory_id = 'common';
@@ -216,7 +232,7 @@ if (!class_exists('\Wpo\Services\Id_Token_Service')) {
             $params = array(
                 'client_id'     => $application_id,
                 'response_type' => 'token',
-                'redirect_uri'  => $redirect_url,
+                'redirect_uri'  => $redirect_uri,
                 'response_mode' => 'form_post',
                 'grant_type'    => 'authorization_code',
                 'scope'         => 'openid email profile offline_access' . (empty($scope) ? '' : (' ' . $scope)),

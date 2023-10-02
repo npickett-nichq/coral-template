@@ -391,7 +391,14 @@ if (!class_exists('\Wpo\Services\Options_Service')) {
                     Log_Service::write_log('WARN', __METHOD__ . ' -> WPO365 is not configured -> Application ID is missing.');
                 }
 
-                $redirect_url_ok = !empty(self::get_aad_option('redirect_url'));
+                /**
+                 * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+                 */
+
+                $redirect_uri = self::get_aad_option('redirect_url');
+                $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
+
+                $redirect_url_ok = !empty($redirect_uri);
 
                 if (!$redirect_url_ok) {
                     $is_wpo365_configured = 0;

@@ -14955,7 +14955,7 @@ body.invites.has-sidebar #buddypress .bp-settings-container .bp-navs .selected a
 }
 
 .widget.buddypress #groups-list li,
-.elementor-widget-wrap #groups-list li {
+.elementor-widget-wrap .elementor-widget-bb-groups #groups-list li {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -16586,7 +16586,6 @@ a.bb-more i:before {
   margin: 25px 0;
 }
 .elementor-widget-wrap #groups-list.bp-list li {
-  min-width: inherit;
   padding: 0 9px;
   margin: 0 0 20px;
   display: list-item;

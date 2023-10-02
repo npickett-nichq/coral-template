@@ -3186,7 +3186,7 @@ html[dir="rtl"] .learndash_next_prev_link span.prev-link:before {
       -ms-flex-align: center;
           align-items: center;
 }
-.lms-header-instructor .bb-about-instructor > h4 {
+.lms-header-instructor .bb-about-instructor > .bb-instructor-heading, .lms-header-instructor .bb-about-instructor > h4 {
   text-transform: uppercase;
   color: var(--bb-headings-color);
   font-size: 13px;
@@ -3344,8 +3344,10 @@ html[dir="rtl"] .lms-header-instructor .bb-about-instructor .bb-about-instructor
       -ms-flex: inherit;
           flex: inherit;
 }
-.bb-about-instructor h4 {
+.bb-about-instructor h4,
+.bb-about-instructor .bb-instructor-heading {
   font-size: 16px;
+  line-height: 1;
   letter-spacing: 0.6px;
   margin: 0 0 15px;
   text-transform: uppercase;
@@ -7592,6 +7594,8 @@ ul.bb-lms-user-profile-tabs .more-button.active:after {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -12739,7 +12743,9 @@ form#registerform {
   width: -webkit-calc(100% - 480px);
   width: calc(100% - 480px);
 }
+.single-item.groups.courses .bb-about-instructor .bb-instructor-heading,
 .single-item.groups.courses .bb-about-instructor h4,
+.learndash-theme.single-sfwd-courses .bb-about-instructor .bb-instructor-heading,
 .learndash-theme.single-sfwd-courses .bb-about-instructor h4 {
   margin-left: 5px;
 }

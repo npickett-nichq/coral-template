@@ -93,8 +93,6 @@ class BP_Zoom_Group {
 
 		add_action( 'groups_delete_group', array( $this, 'delete_group_delete_all_meetings' ), 10 );
 		add_action( 'groups_delete_group', array( $this, 'delete_group_delete_all_webinars' ), 10 );
-
-		add_action( 'bp_before_group_body', array( $this, 'bb_group_zoom_display_site_notice' ), 10 );
 	}
 
 	/**
@@ -152,7 +150,7 @@ class BP_Zoom_Group {
 				$default_args
 			);
 
-			$webinar_enabled = groups_get_groupmeta( $current_group->id, 'bp-group-zoom-enable-webinar', true );
+			$webinar_enabled = bp_zoom_groups_is_webinars_enabled( $current_group->id );
 
 			if ( ! empty( $webinar_enabled ) ) {
 				$sub_nav[] = array_merge(
@@ -576,12 +574,7 @@ class BP_Zoom_Group {
 		);
 
 		// Should box be checked already?
-		$checked         = bp_zoom_group_is_zoom_enabled( $group_id );
-		$api_key         = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-key' );
-		$api_secret      = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-secret' );
-		$api_email       = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email' );
-		$webhook_token   = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-webhook-token' );
-		$is_jwt_tab_hide = bb_zoom_group_is_hide_jwt_settings( $group_id );
+		$checked = bp_zoom_group_is_zoom_enabled( $group_id );
 
 		// Get S2S settings.
 		$connection_type = groups_get_groupmeta( $group_id, 'bp-group-zoom-connection-type' );
@@ -652,11 +645,6 @@ class BP_Zoom_Group {
 						<li>
 							<a href="#bp-group-zoom-settings-additional" class="<?php echo ( 'permissions' === $current_tab ) ? esc_attr( 'active-tab' ) : ''; ?>" role="tab" aria-selected="<?php echo esc_attr( ( 'permissions' === $current_tab ) ); ?>" aria-controls="bp-group-zoom-settings-additional" id="tab-2" data-value="permissions"><?php esc_html_e( 'Group Permissions', 'buddyboss-pro' ); ?></a>
 						</li>
-						<?php if ( ! $is_jwt_tab_hide ) { ?>
-							<li>
-								<a href="#bp-group-zoom-settings" class="<?php echo ( 'jwt' === $current_tab ) ? esc_attr( 'active-tab' ) : ''; ?>" role="tab" aria-selected="<?php echo esc_attr( ( 'jwt' === $current_tab ) ); ?>" aria-controls="bp-group-zoom-settings" id="tab-3" data-value="jwt"><?php esc_html_e( 'Legacy Settings', 'buddyboss-pro' ); ?></a>
-							</li>
-						<?php } ?>
 					</ul>
 				</div><!-- .bb-zoom-setting-tabs -->
 				<div class="bb-zoom-setting-content">
@@ -845,106 +833,6 @@ class BP_Zoom_Group {
 							<p class="group-setting-label bb-zoom-setting-description"><?php esc_html_e( 'The Zoom account connected to this group will be assigned as the default host for every meeting and webinar, regardless of which member they are created by.', 'buddyboss-pro' ); ?></p>
 						</fieldset>
 					</div><!-- #bp-group-zoom-settings-additional -->
-
-					<?php if ( ! $is_jwt_tab_hide ) { ?>
-						<div id="bp-group-zoom-settings" class="bb-zoom-setting-content-tab bp-group-zoom-settings <?php echo ( 'jwt' === $current_tab ) ? esc_attr( 'active-tab' ) : ''; ?>" role="tabpanel" aria-labelledby="tab-3">
-							<fieldset>
-								<legend class="screen-reader-text"><?php esc_html_e( 'Zoom API Credentials', 'buddyboss-pro' ); ?></legend>
-
-								<?php
-								if (
-									! bb_zoom_group_is_s2s_connected( $group_id ) &&
-									bb_zoom_group_is_jwt_connected( $group_id )
-								) {
-									?>
-									<div class="bp-messages-feedback admin-notice group-zoom-sidewide-deprecated-notice">
-										<aside class="bp-feedback bp-feedback-v2 bp-messages warning">
-											<span class="bp-icon" aria-hidden="true"></span>
-											<p><?php esc_html_e( 'Zoom will depreciate support for connecting with these settings on September 1, 2023.', 'buddyboss-pro' ); ?></p>
-										</aside>
-									</div>
-									<?php
-								}
-
-								$bb_group_zoom_errors   = groups_get_groupmeta( $group_id, 'bp-zoom-api-errors' );
-								$bb_group_zoom_warnings = groups_get_groupmeta( $group_id, 'bp-zoom-api-warnings' );
-								$bb_group_zoom_success  = groups_get_groupmeta( $group_id, 'bp-zoom-api-success' );
-
-								$group_errors   = $bb_group_zoom_errors ?? array();
-								$group_warnings = $bb_group_zoom_warnings ?? array();
-								$group_success  = $bb_group_zoom_success ?? '';
-
-								if ( ! empty( $group_errors ) ) {
-									$error_message = array();
-									foreach ( $group_errors as $error ) {
-										$error_message[] = esc_html( $error->get_error_message() );
-									}
-									bb_zoom_group_display_feedback_notice( $error_message );
-									groups_delete_groupmeta( $group_id, 'bp-zoom-api-errors' );
-								} elseif ( ! empty( $group_warnings ) ) {
-									$warning_message = array();
-									foreach ( $group_warnings as $warning ) {
-										$warning_message[] = $warning->get_error_message();
-									}
-									bb_zoom_group_display_feedback_notice( $warning_message, 'warning' );
-									groups_delete_groupmeta( $group_id, 'bp-zoom-api-warnings' );
-								} elseif ( ! empty( $group_success ) ) {
-									bb_zoom_group_display_feedback_notice( $group_success, 'success' );
-									groups_delete_groupmeta( $group_id, 'bp-zoom-api-success' );
-								}
-								?>
-
-								<div class="bb-field-wrap">
-									<label for="bp-group-zoom-api-key" class="group-setting-label"><?php esc_html_e( 'API Key', 'buddyboss-pro' ); ?></label>
-									<div class="bp-input-wrap">
-										<div class="password-toggle">
-											<input type="password" name="bp-group-zoom-api-key" id="bp-group-zoom-api-key" class="zoom-group-instructions-main-input" value="<?php echo esc_attr( $api_key ); ?>"/>
-											<button type="button" class="bb-hide-pw hide-if-no-js" aria-label="<?php esc_attr_e( 'Toggle', 'buddyboss-pro' ); ?>">
-												<span class="bb-icon bb-icon-eye-small" aria-hidden="true"></span>
-											</button>
-										</div>
-									</div>
-								</div>
-
-								<div class="bb-field-wrap">
-									<label for="bp-group-zoom-api-secret" class="group-setting-label"><?php esc_html_e( 'API Secret', 'buddyboss-pro' ); ?></label>
-									<div class="bp-input-wrap">
-										<div class="password-toggle">
-											<input type="password" name="bp-group-zoom-api-secret" id="bp-group-zoom-api-secret" class="zoom-group-instructions-main-input" value="<?php echo esc_attr( $api_secret ); ?>"/>
-											<button type="button" class="bb-hide-pw hide-if-no-js" aria-label="<?php esc_attr_e( 'Toggle', 'buddyboss-pro' ); ?>">
-												<span class="bb-icon bb-icon-eye-small" aria-hidden="true"></span>
-											</button>
-										</div>
-									</div>
-								</div>
-
-								<div class="bb-field-wrap">
-									<label for="bp-group-zoom-api-email" class="group-setting-label"><?php esc_html_e( 'Zoom Account Email', 'buddyboss-pro' ); ?></label>
-									<div class="bp-input-wrap">
-										<div class="password-toggle">
-											<input type="password" name="bp-group-zoom-api-email" id="bp-group-zoom-api-email" class="zoom-group-instructions-main-input" value="<?php echo esc_attr( $api_email ); ?>"/>
-											<button type="button" class="bb-hide-pw hide-if-no-js" aria-label="<?php esc_attr_e( 'Toggle', 'buddyboss-pro' ); ?>">
-												<span class="bb-icon bb-icon-eye-small" aria-hidden="true"></span>
-											</button>
-										</div>
-									</div>
-								</div>
-
-								<div class="bb-field-wrap">
-									<label for="bp-group-zoom-api-webhook-token" class="group-setting-label"><?php esc_html_e( 'Security Token', 'buddyboss-pro' ); ?></label>
-									<div class="bp-input-wrap">
-										<div class="password-toggle">
-											<input type="password" name="bp-group-zoom-api-webhook-token" id="bp-group-zoom-api-webhook-token" class="zoom-group-instructions-main-input" value="<?php echo esc_attr( $webhook_token ); ?>"/>
-											<button type="button" class="bb-hide-pw hide-if-no-js" aria-label="<?php esc_attr_e( 'Toggle', 'buddyboss-pro' ); ?>">
-												<span class="bb-icon bb-icon-eye-small" aria-hidden="true"></span>
-											</button>
-										</div>
-									</div>
-								</div>
-							</fieldset>
-
-						</div><!-- #bp-group-zoom-settings -->
-					<?php } ?>
 
 				</div><!-- .bb-zoom-setting-content -->
 
@@ -1455,92 +1343,14 @@ class BP_Zoom_Group {
 		$edit_zoom = filter_input( INPUT_POST, 'bp-edit-group-zoom', FILTER_VALIDATE_INT );
 		$manager   = bb_pro_filter_input_string( INPUT_POST, 'bp-group-zoom-manager' );
 
-		$edit_zoom     = ! empty( $edit_zoom ) ? true : false;
-		$manager       = ! empty( $manager ) ? $manager : bp_zoom_group_get_manager( $group_id );
-		$group_id      = ! empty( $group_id ) ? $group_id : bp_get_current_group_id();
-		$old_api_email = '';
+		$edit_zoom = ! empty( $edit_zoom );
+		$manager   = ! empty( $manager ) ? $manager : bp_zoom_group_get_manager( $group_id );
+		$group_id  = ! empty( $group_id ) ? $group_id : bp_get_current_group_id();
 
 		groups_update_groupmeta( $group_id, 'bp-group-zoom', $edit_zoom );
 		groups_update_groupmeta( $group_id, 'bp-group-zoom-manager', $manager );
 
 		bp_core_add_message( __( 'Group Zoom settings were successfully updated.', 'buddyboss-pro' ), 'success' );
-
-		// Added support for JWT until 1st September 2023.
-		if ( $edit_zoom && strtotime( 'now' ) < 1693526400 ) {
-
-			$api_key       = bb_pro_filter_input_string( INPUT_POST, 'bp-group-zoom-api-key' );
-			$api_secret    = bb_pro_filter_input_string( INPUT_POST, 'bp-group-zoom-api-secret' );
-			$api_email     = filter_input( INPUT_POST, 'bp-group-zoom-api-email', FILTER_VALIDATE_EMAIL );
-			$webhook_token = bb_pro_filter_input_string( INPUT_POST, 'bp-group-zoom-api-webhook-token' );
-
-			// Retrieve old settings.
-			$old_api_email = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email', true );
-
-			groups_update_groupmeta( $group_id, 'bp-group-zoom-api-key', $api_key );
-			groups_update_groupmeta( $group_id, 'bp-group-zoom-api-secret', $api_secret );
-			groups_update_groupmeta( $group_id, 'bp-group-zoom-api-email', $api_email );
-			groups_update_groupmeta( $group_id, 'bp-group-zoom-api-webhook-token', $webhook_token );
-
-			if ( ! empty( $api_key ) && ! empty( $api_secret ) ) {
-				$bp_zoom_group_api_errors   = array();
-				$bp_zoom_group_api_warnings = array();
-				$bp_zoom_group_api_success  = '';
-
-				if ( ! empty( $api_email ) ) {
-					BP_Zoom_Conference_Api::$is_jwt_auth  = true;
-					bp_zoom_conference()->zoom_api_key    = $api_key;
-					bp_zoom_conference()->zoom_api_secret = $api_secret;
-					$user_info                            = bp_zoom_conference()->get_user_info( $api_email );
-
-					if ( 200 === $user_info['code'] ) {
-						groups_update_groupmeta( $group_id, 'bp-group-zoom-api-host', $user_info['response']->id );
-						groups_update_groupmeta( $group_id, 'bp-group-zoom-api-host-type', $user_info['response']->type );
-						groups_update_groupmeta( $group_id, 'bp-group-zoom-api-host-user', wp_json_encode( $user_info['response'] ) );
-
-						if ( $old_api_email !== $api_email ) {
-							bb_zoom_group_hide_unhide_meetings( $group_id, $api_email, $old_api_email );
-						}
-
-						// Get user settings of host user.
-						$user_settings = bp_zoom_conference()->get_user_settings( $user_info['response']->id );
-
-						// Save user settings into group meta.
-						if ( 200 === $user_settings['code'] && ! empty( $user_settings['response'] ) ) {
-							groups_update_groupmeta( $group_id, 'bp-group-zoom-api-host-user-settings', wp_json_encode( $user_settings['response'] ) );
-
-							if ( isset( $user_settings['response']->feature->webinar ) && true === $user_settings['response']->feature->webinar ) {
-								groups_update_groupmeta( $group_id, 'bp-group-zoom-enable-webinar', true );
-							} else {
-								groups_delete_groupmeta( $group_id, 'bp-group-zoom-enable-webinar' );
-							}
-							$bp_zoom_group_api_success = __( 'Group Zoom settings were successfully updated.', 'buddyboss-pro' );
-						} else {
-							$bp_zoom_group_api_warnings[] = new WP_Error( 'api_error', __( 'Invalid JWT credentials.', 'buddyboss-pro' ) );
-						}
-					} else {
-						$bp_zoom_group_api_errors[] = new WP_Error( 'api_error', __( 'Invalid JWT Credentials. Please enter valid key, secret key or account email.', 'buddyboss-pro' ) );
-					}
-				} else {
-					$bp_zoom_group_api_errors[] = new WP_Error( 'api_error', __( 'There was an error updating group Zoom JWT API settings. Please try again.', 'buddyboss-pro' ) );
-				}
-
-				if (
-					! empty( $bp_zoom_group_api_errors ) ||
-					! empty( $bp_zoom_group_api_warnings )
-				) {
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-api-email' );
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-api-host' );
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-api-host-type' );
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-api-host-user' );
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-api-host-user-settings' );
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-enable-webinar' );
-				}
-
-				groups_update_groupmeta( $group_id, 'bp-zoom-api-errors', $bp_zoom_group_api_errors );
-				groups_update_groupmeta( $group_id, 'bp-zoom-api-warnings', $bp_zoom_group_api_warnings );
-				groups_update_groupmeta( $group_id, 'bp-zoom-api-success', $bp_zoom_group_api_success );
-			}
-		}
 
 		// Save S2S credentials.
 		if ( $edit_zoom ) {
@@ -1558,7 +1368,6 @@ class BP_Zoom_Group {
 					'account_email' => $s2s_api_email,
 					'secret_token'  => $s2s_secret_token,
 					'group_id'      => $group_id,
-					'old_api_email' => $old_api_email,
 				)
 			);
 		}
@@ -1574,7 +1383,6 @@ class BP_Zoom_Group {
 
 		$bb_active_tab = bb_pro_filter_input_string( INPUT_POST, 'bb-zoom-tab' );
 		$bb_active_tab = ! empty( $bb_active_tab ) ? $bb_active_tab : 's2s';
-		$bb_active_tab = bb_zoom_group_is_hide_jwt_settings( $group_id ) ? 's2s' : $bb_active_tab;
 
 		// Redirect after save.
 		bp_core_redirect( trailingslashit( bp_get_group_permalink( buddypress()->groups->current_group ) . '/admin/zoom' ) . '?type=' . $bb_active_tab );
@@ -1613,31 +1421,35 @@ class BP_Zoom_Group {
 
 			// Save user settings into group meta.
 			if ( 200 === $user_settings['code'] && ! empty( $user_settings['response'] ) ) {
-				if ( bb_zoom_group_is_s2s_connected( $group_id ) ) {
-					$connection_type = bb_zoom_group_get_connection_type( $group_id );
-					if ( 'site' === $connection_type ) {
-						$bb_group_zoom = bp_get_option( 'bb-zoom' );
-						if ( empty( $bb_group_zoom ) ) {
-							$bb_group_zoom = array();
-						}
-						$bb_group_zoom['account_host_user_settings'] = $user_settings['response'];
-						bp_update_option( 'bb-zoom', $bb_group_zoom );
-					} elseif ( 'group' === $connection_type ) {
-						$bb_group_zoom = groups_get_groupmeta( $group_id, 'bb-group-zoom' );
-						if ( empty( $bb_group_zoom ) ) {
-							$bb_group_zoom = array();
-						}
-						$bb_group_zoom['account_host_user_settings'] = $user_settings['response'];
-						groups_update_groupmeta( $group_id, 'bb-group-zoom', $bb_group_zoom );
+				$connection_type = bb_zoom_group_get_connection_type( $group_id );
+				if ( 'site' === $connection_type ) {
+					$bb_group_zoom = bp_get_option( 'bb-zoom' );
+					if ( empty( $bb_group_zoom ) ) {
+						$bb_group_zoom = array();
 					}
-				} elseif ( bb_zoom_group_is_jwt_connected( $group_id ) ) {
-					groups_update_groupmeta( $group_id, 'bp-group-zoom-api-host-user-settings', wp_json_encode( $user_settings['response'] ) );
-				}
+					$bb_group_zoom['account_host_user_settings'] = $user_settings['response'];
+					bp_update_option( 'bb-zoom', $bb_group_zoom );
 
-				if ( isset( $user_settings['response']->feature->webinar ) && true === $user_settings['response']->feature->webinar ) {
-					groups_update_groupmeta( $group_id, 'bp-group-zoom-enable-webinar', true );
-				} else {
-					groups_delete_groupmeta( $group_id, 'bp-group-zoom-enable-webinar' );
+					// Checked webinar.
+					if ( isset( $user_settings['response']->feature->webinar ) && true === $user_settings['response']->feature->webinar ) {
+						bp_update_option( 'bp-zoom-enable-webinar', true );
+					} else {
+						bp_delete_option( 'bp-zoom-enable-webinar' );
+					}
+				} elseif ( 'group' === $connection_type ) {
+					$bb_group_zoom = groups_get_groupmeta( $group_id, 'bb-group-zoom' );
+					if ( empty( $bb_group_zoom ) ) {
+						$bb_group_zoom = array();
+					}
+					$bb_group_zoom['account_host_user_settings'] = $user_settings['response'];
+					groups_update_groupmeta( $group_id, 'bb-group-zoom', $bb_group_zoom );
+
+					// Checked webinar.
+					if ( isset( $user_settings['response']->feature->webinar ) && true === $user_settings['response']->feature->webinar ) {
+						groups_update_groupmeta( $group_id, 'bp-group-zoom-enable-webinar', true );
+					} else {
+						groups_delete_groupmeta( $group_id, 'bp-group-zoom-enable-webinar' );
+					}
 				}
 			}
 			groups_update_groupmeta( $group_id, 'bp-group-zoom-webinar-checked', true );
@@ -2991,21 +2803,6 @@ class BP_Zoom_Group {
 						</label>
 					</div>
 				</fieldset>
-
-				<?php
-				if (
-					! bb_zoom_group_is_s2s_connected( $group_id ) &&
-					bb_zoom_group_is_jwt_connected( $group_id )
-				) {
-					?>
-					<div class="bp-messages-feedback admin-notice" id="bb-zoom-group-admin-jwt-notice">
-						<aside class="bp-feedback bp-feedback-v2 bp-messages warning">
-							<span class="bp-icon" aria-hidden="true"></span>
-							<p><?php esc_html_e( 'This group is connected using JWT authentication, which will be depreciated on September 1, 2023.', 'buddyboss-pro' ); ?></p>
-						</aside>
-					</div>
-				<?php } ?>
-
 				<hr class="bb-sep-line"/>
 			</div>
 
@@ -3104,15 +2901,10 @@ class BP_Zoom_Group {
 
 				// Find old account email.
 				$old_account_email = '';
-				if ( empty( $old_connection_type ) ) {
-					$old_account_email = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email' );
-				} elseif ( 'site' === $old_connection_type ) {
+				if ( 'site' === $old_connection_type ) {
 					$old_account_email = bb_zoom_account_email();
 				} elseif ( 'group' === $old_connection_type ) {
 					$old_account_email = groups_get_groupmeta( $group_id, 'bb-group-zoom-s2s-api-email' );
-					if ( empty( $old_account_email ) ) {
-						$old_account_email = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email' );
-					}
 				}
 
 				// Find new account email.
@@ -3122,9 +2914,6 @@ class BP_Zoom_Group {
 						$new_account_email = bb_zoom_account_email();
 					} elseif ( 'group' === $connection_type ) {
 						$new_account_email = groups_get_groupmeta( $group_id, 'bb-group-zoom-s2s-api-email' );
-						if ( empty( $new_account_email ) ) {
-							$new_account_email = groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email' );
-						}
 					}
 				}
 
@@ -3157,57 +2946,5 @@ class BP_Zoom_Group {
 		 * @param int $group_id Current group id
 		 */
 		do_action( 'bp_group_admin_after_edit_screen_save', $group_id );
-	}
-
-	/**
-	 * Display site-wise notice.
-	 *
-	 * @since 2.3.91
-	 */
-	public function bb_group_zoom_display_site_notice() {
-		$group_id = bp_get_current_group_id();
-
-		if (
-			! empty( $group_id ) &&
-			is_user_logged_in() &&
-			function_exists( 'bp_is_item_admin' ) &&
-			bp_is_item_admin()
-		) {
-			$group_zoom_settings = groups_get_groupmeta( $group_id, 'bb-group-zoom' );
-			if (
-				! empty( $group_zoom_settings['sidewide_errors'] ) &&
-				is_array( $group_zoom_settings['sidewide_errors'] ) &&
-				in_array( 'upgrade_jwt_to_s2s', $group_zoom_settings['sidewide_errors'], true )
-			) {
-				$group_link         = bp_get_group_permalink( groups_get_group( $group_id ) );
-				$zoom_settings_link = untrailingslashit( $group_link . 'admin/zoom/#bp-zoom-group-show-instructions-popup-' . $group_id );
-				if ( bp_is_groups_component() && bp_is_current_action( 'admin' ) && bp_is_action_variable( 'zoom', 0 ) ) {
-					$zoom_settings_link = '#bp-zoom-group-show-instructions-popup-' . $group_id;
-				}
-				?>
-				<div class="bp-messages-feedback group-zoom-sidewide-deprecated-notice">
-					<div class="bp-feedback info">
-						<span class="bp-icon" aria-hidden="true"></span>
-						<p>
-							<?php
-							echo wp_kses_post(
-								sprintf(
-								/* translators: Link for Setup Wizard. */
-									esc_html__( 'Zoom will block access using JWT credentials using from September 1, 2023. To keep your group connected to Zoom, please use the %s to connect your account using the new method.', 'buddyboss-pro' ),
-									sprintf(
-									/* translators: Title of a link for Setup Wizard. */
-										'<a class="open-setup-wizard show-zoom-instructions" href="%1$s">%2$s</a>',
-										esc_url( $zoom_settings_link ),
-										esc_html__( 'setup wizard', 'buddyboss-pro' )
-									)
-								)
-							);
-							?>
-						</p>
-					</div>
-				</div>
-				<?php
-			}
-		}
 	}
 }

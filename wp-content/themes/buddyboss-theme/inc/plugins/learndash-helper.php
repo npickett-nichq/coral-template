@@ -140,6 +140,9 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 
 
 			add_action( 'learndash-content-tabs-after', array( $this, 'buddyboss_lms_support_page_break_block' ), 20 );
+
+			// Filter the tabs for Learndash Elementor addon.
+			add_filter( 'learndash_elementor_use_content_tabs', array( $this, 'buddyboss_learndash_elementor_tabs' ), 10, 1 );
 		}
 
 		public function bb_learndash_30_custom_colors() {
@@ -1061,24 +1064,27 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 		/**
 		 * Print the options for categories dropdown.
 		 *
+		 * @since BuddyBossTheme 1.0.0
+		 *
 		 * @param array|string $args       {
 		 *                                 Array of parameters. All items are optional.
 		 *
-		 * @type string|array $selected    Selected items
-		 * @type string $orderby           Orderby. Default name
-		 * @type string $order             Default 'ASC'
-		 * @type string $option_all        Text to display for 'all' option
-		 * }
-		 * @since BuddyBossTheme 1.0.0
+		 * @type string|array  $selected   Selected items
+		 * @type string        $orderby    Orderby. Default name
+		 * @type string        $order      Default 'ASC'
+		 * @type string        $option_all Text to display for 'all' option
+		 *                                 }
 		 *
+		 * @return mixed
 		 */
 		public function print_categories_options( $args = '' ) {
-			$defaults = [
+			$defaults = array(
 				'selected'   => false,
 				'orderby'    => 'name',
 				'order'      => 'ASC',
+				'include'    => array(),
 				'option_all' => __( 'All Categories', 'buddyboss-theme' ),
-			];
+			);
 
 			$args = wp_parse_args( $args, $defaults );
 
@@ -1086,28 +1092,38 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 				$args['selected'] = isset ( $_GET['filter-categories'] ) && ! empty ( $_GET['filter-categories'] ) ? $_GET['filter-categories'] : '';
 			}
 
-			$all_cate = "<option value='all'>{$args['option_all']}</option>";
+			$all_cate_val = 'all';
 
 			$archive_category_taxonomy = buddyboss_theme_get_option( 'learndash_course_index_categories_filter_taxonomy' );
 			if ( empty( $archive_category_taxonomy ) ) {
 				$archive_category_taxonomy = 'ld_course_category';
 			}
 
-			$categories = get_terms( [
-				'taxonomy' => $archive_category_taxonomy,
-				'orderby'  => $args['orderby'],
-				'order'    => $args['order'],
-			] );
+			$categories = get_terms(
+				array(
+					'taxonomy' => $archive_category_taxonomy,
+					'orderby'  => $args['orderby'],
+					'order'    => $args['order'],
+					'include'  => $args['include'],
+				)
+			);
 
 			$html = '';
 			if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+
+				$category_slugs = array();
 				foreach ( $categories as $term ) {
-					$html .= sprintf( "<option value='%s' %s>%s</option>", $term->slug, selected( $args['selected'], $term->slug, false ), $term->name );
+					$html             .= sprintf( "<option value='%s' %s>%s</option>", $term->slug, selected( $args['selected'], $term->slug, false ), $term->name );
+					$category_slugs[] = $term->slug;
+				}
+
+				if ( ! empty( $args['include'] ) ) {
+					$all_cate_val = implode( ',', $category_slugs );
 				}
 			}
 
 			if ( '' !== $html ) {
-				return $all_cate . $html;
+				return "<option value='{$all_cate_val}'>{$args['option_all']}</option>" . $html;
 			}
 		}
 
@@ -1134,7 +1150,7 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 
 		}
 
-		protected function _archive_filterby_tax ( $query ) {
+		protected function _archive_filterby_tax( $query ) {
 			$tax_query = $query->get( 'tax_query' );
 
 			if ( empty( $tax_query ) ) {
@@ -1151,7 +1167,7 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 				$tax_query[] = array(
 					'taxonomy'         => $archive_category_taxonomy,
 					'field'            => 'slug',
-					'terms'            => $_GET["filter-categories"],
+					'terms'            => explode( ',', $_GET["filter-categories"] ),
 					'include_children' => false,
 				);
 			}
@@ -1159,7 +1175,7 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 			if ( ! empty( $_GET["filter-block-categories"] ) || ! empty( $_GET["filter-block-tags"] ) ) {
 				$tax_blog_query = array(
 					'relation' => 'AND',
-                );
+				);
 
 				/**
 				 * Without interact with theme setting. Filter course by course categories
@@ -2582,6 +2598,27 @@ if ( ! class_exists( '\BuddyBossTheme\LearndashHelper' ) ) {
 					'after'  => '</div>',
 				)
 			);
+		}
+
+		/**
+		 * Fixes the issue of duplicate tabs on single lesson and topic pages caused by the Learndash Elementor addon.
+		 *
+		 * @since BuddyBoss 2.4.20
+		 *
+		 * @param string $step_material_select The step material selector.
+		 *
+		 * @return mixed
+		 */
+		public function buddyboss_learndash_elementor_tabs( $step_material_select ) {
+
+			if (
+				is_singular( learndash_get_post_type_slug( 'lesson' ) ) ||
+				is_singular( learndash_get_post_type_slug( 'topic' ) )
+			) {
+				return '';
+			}
+
+			return $step_material_select;
 		}
 	}
 }

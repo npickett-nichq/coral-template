@@ -273,6 +273,22 @@ if (!class_exists('\Wpo\Services\Jwt_Token_Service')) {
                 }
 
                 $open_id_config_url = "$b2c_domain$directory_id/$b2c_policy_name/v2.0/.well-known/openid-configuration";
+            } else if (!$use_mail_config && Options_Service::get_global_boolean_var('use_ciam')) {
+                $b2c_domain_name = Options_Service::get_global_string_var('b2c_domain_name');
+
+                /**
+                 * @since   20.x    Support for custom b2c login domain e.g. login.contoso.com
+                 */
+
+                $b2c_domain = Options_Service::get_global_string_var('b2c_custom_domain');
+
+                if (empty($b2c_domain)) {
+                    $b2c_domain = sprintf('https://%s.ciamlogin.com/', $b2c_domain_name);
+                } else {
+                    $b2c_domain = sprintf('https://%s', trailingslashit($b2c_domain));
+                }
+
+                $open_id_config_url = "$b2c_domain$directory_id/v2.0/.well-known/openid-configuration";
             } else {
                 $open_id_config_url = "https://login.microsoftonline.com/$directory_id/v2.0/.well-known/openid-configuration?appid=$application_id";
             }

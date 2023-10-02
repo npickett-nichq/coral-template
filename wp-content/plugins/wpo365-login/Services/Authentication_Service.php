@@ -500,20 +500,18 @@ if (!class_exists('\Wpo\Services\Authentication_Service')) {
                 Log_Service::write_log('ERROR', __METHOD__ . ' -> $_SERVER[PHP_SELF] is empty. Please review your server configuration.');
             }
 
-            if (WordPress_Helpers::stripos($redirect_to, basename($_SERVER['PHP_SELF'])) === false) {
-                do_action('destroy_wpo365_session');
+            do_action('destroy_wpo365_session');
 
-                wp_destroy_current_session();
-                wp_clear_auth_cookie();
-                wp_set_current_user(0);
+            wp_destroy_current_session();
+            wp_clear_auth_cookie();
+            wp_set_current_user(0);
 
-                unset($_COOKIE[AUTH_COOKIE]);
-                unset($_COOKIE[SECURE_AUTH_COOKIE]);
-                unset($_COOKIE[LOGGED_IN_COOKIE]);
+            unset($_COOKIE[AUTH_COOKIE]);
+            unset($_COOKIE[SECURE_AUTH_COOKIE]);
+            unset($_COOKIE[LOGGED_IN_COOKIE]);
 
-                $redirect_to = add_query_arg('login_errors', $login_error_code, $redirect_to);
-                Url_Helpers::force_redirect($redirect_to);
-            }
+            $redirect_to = add_query_arg('login_errors', $login_error_code, $redirect_to);
+            Url_Helpers::force_redirect($redirect_to);
         }
 
         /**
@@ -715,7 +713,6 @@ if (!class_exists('\Wpo\Services\Authentication_Service')) {
             $scenario = Options_Service::get_global_string_var('auth_scenario');
 
             if (!is_admin() && !is_network_admin() && ($scenario === 'internet' || $scenario === 'internetAuthOnly')) {
-
                 $private_pages = Options_Service::get_global_list_var('private_pages');
                 $login_urls = Url_Helpers::get_login_urls();
 

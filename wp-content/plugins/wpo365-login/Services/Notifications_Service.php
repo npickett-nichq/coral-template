@@ -33,6 +33,17 @@ if (!class_exists('\Wpo\Services\Notifications_Service')) {
 
             if (is_super_admin() && (!is_multisite() || Options_Service::mu_use_subsite_options() || (!Options_Service::mu_use_subsite_options() && is_network_admin()))) {
 
+                if (!empty($_REQUEST['send-to-azure'])) {
+                    $users_sent = (int) $_REQUEST['send-to-azure'];
+                    $target_ciam = Options_Service::get_global_boolean_var('use_b2c') ? 'Azure AD B2C' : (Options_Service::get_global_boolean_var('use_ciam') ? 'Entra External ID' : '');
+                    printf('<div id="message" class="updated notice is-dismissable"><p>' . __('Created / updated %d users in %s', 'wpo365-login') . '</p></div>', $users_sent, $target_ciam);
+                }
+
+                if (!empty($_REQUEST['re-activate-users'])) {
+                    $users_reactivated = (int) $_REQUEST['re-activate-users'];
+                    printf('<div id="message" class="updated notice is-dismissable"><p>' . __('Reactivated %d users', 'wpo365-login') . '</p></div>', $users_reactivated);
+                }
+
                 if (false === Options_Service::get_global_boolean_var('hide_error_notice')) {
                     $cached_errors = Wpmu_Helpers::mu_get_transient('wpo365_errors');
 

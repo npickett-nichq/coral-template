@@ -70,16 +70,16 @@ if (!class_exists('\Wpo\Core\Permissions_Helpers')) {
         {
             $block_password_change = Options_Service::get_global_boolean_var('block_password_change');
 
-            // Not configured or not blocked
-            if (false === $block_password_change) { // user is not logged on
+            if (!$block_password_change) {
                 Log_Service::write_log('DEBUG', __METHOD__ . ' -> Not blocking password update');
                 return false;
             }
 
+            $use_customers_tenants = Options_Service::get_global_boolean_var('use_b2c') || Options_Service::get_global_boolean_var('use_ciam');
             $wp_usr = get_user_by('ID', intval($user_id));
 
             // Limit the blocking of password update only for O365 users
-            return User_Service::user_is_o365_user($user_id) === User_Service::IS_O365_USER && !self::user_is_admin($wp_usr) ? true : false;
+            return ($use_customers_tenants || User_Service::user_is_o365_user($user_id) === User_Service::IS_O365_USER) && !self::user_is_admin($wp_usr) ? true : false;
         }
 
         /**
@@ -95,10 +95,13 @@ if (!class_exists('\Wpo\Core\Permissions_Helpers')) {
         {
 
             // Don't block as per global settings configuration
-            if (
-                false === Options_Service::get_global_boolean_var('block_email_change')
-                || User_Service::user_is_o365_user($user_id) !== User_Service::IS_O365_USER
-            ) {
+            if (false === Options_Service::get_global_boolean_var('block_email_change')) {
+                return;
+            }
+
+            $use_customers_tenants = Options_Service::get_global_boolean_var('use_b2c') || Options_Service::get_global_boolean_var('use_ciam');
+
+            if (!$use_customers_tenants && User_Service::user_is_o365_user($user_id) !== User_Service::IS_O365_USER) {
                 return;
             }
 

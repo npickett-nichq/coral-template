@@ -1116,7 +1116,7 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 				$tax_query[] = array(
 					'taxonomy'         => self::LMS_CATEGORY_SLUG,
 					'field'            => 'slug',
-					'terms'            => $_GET["filter-categories"],
+					'terms'            => explode( ',', $_GET["filter-categories"] ),
 					'include_children' => false,
 				);
 			}
@@ -1287,27 +1287,28 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 		/**
 		 * Print the options for categories dropdown.
 		 *
-		 * @param array|string $args    {
-		 *                              Array of parameters. All items are optional.
-		 *
-		 * @type string|array $selected Selected items
-		 * @type string $orderby        Orderby. Default name
-		 * @type string $order          Default 'ASC'
-		 * @type string $option_all     Text to display for 'all' option
-		 * }
 		 * @since BuddyBossTheme 1.0.0
 		 *
+		 * @param array|string $args       {
+		 *                                 Array of parameters. All items are optional.
+		 *
+		 * @type string|array  $selected   Selected items
+		 * @type string        $orderby    Orderby. Default name
+		 * @type string        $order      Default 'ASC'
+		 * @type string        $option_all Text to display for 'all' option
+		 *                                 }
+		 *
+		 * @return mixed
 		 */
 		public function print_categories_options( $args = '' ) {
 
-			$defaults = [
+			$defaults = array(
 				'selected'   => false,
 				'orderby'    => 'name',
 				'order'      => 'ASC',
+				'include'    => array(),
 				'option_all' => __( 'All Categories', 'buddyboss-theme' ),
-			];
-
-			$buddyboss_theme_options = get_option( 'buddyboss_theme_options', [] );
+			);
 
 			$args = wp_parse_args( $args, $defaults );
 
@@ -1315,69 +1316,56 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 				$args['selected'] = isset( $_GET['filter-categories'] ) && ! empty( $_GET['filter-categories'] ) ? $_GET['filter-categories'] : '';
 			}
 
-			$all_cate = "<option value='all'>{$args['option_all']}</option>";
+			$all_cate_val = 'all';
 
-
-			if ( 'llms_course_category' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_cat';
-			} elseif ( 'llms_course_tag' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_difficulty';
-			} elseif ( 'llms_course_tag' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_tag';
-			} else {
-				$taxonomy = 'course_track';
-			}
-
+			$taxonomy = $this->get_theme_category();
 			$category = get_queried_object();
 
 			if ( isset( $category->term_id ) && $category->term_id ) {
 				$categories = get_terms(
-					[
+					array(
 						'taxonomy' => "$category->taxonomy",
 						'orderby'  => $args['orderby'],
 						'order'    => $args['order'],
-					]
+						'include'  => $args['include'],
+					)
 				);
 			} else {
 				$categories = get_terms(
-					[
+					array(
 						'taxonomy' => "$taxonomy",
 						'orderby'  => $args['orderby'],
 						'order'    => $args['order'],
-					]
+						'include'  => $args['include'],
+					)
 				);
 			}
 
 			$html = '';
 			if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+
+				$category_slugs = array();
 				foreach ( $categories as $term ) {
-					$html .= sprintf( "<option value='%s' %s>%s</option>", $term->slug, selected( $args['selected'], $term->slug, false ), $term->name );
+					$html             .= sprintf( "<option value='%s' %s>%s</option>", $term->slug, selected( $args['selected'], $term->slug, false ), $term->name );
+					$category_slugs[] = $term->slug;
+				}
+
+				if ( ! empty( $args['include'] ) ) {
+					$all_cate_val = implode( ',', $category_slugs );
 				}
 			}
 
 			if ( '' !== $html ) {
-				return $all_cate . $html;
+				return "<option value='{$all_cate_val}'>{$args['option_all']}</option>" . $html;
 			}
 		}
 
 		public function get_course_category() {
-
-			$buddyboss_theme_options = get_option( 'buddyboss_theme_options', [] );
-
-			if ( 'llms_course_category' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_cat';
-			} elseif ( 'llms_course_tag' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_difficulty';
-			} elseif ( 'llms_course_tag' === $buddyboss_theme_options['lifterlms_course_index_categories_filter_taxonomy'] ) {
-				$taxonomy = 'course_tag';
-			} else {
-				$taxonomy = 'course_track';
-			}
-
+			$taxonomy   = $this->get_theme_category();
 			$categories = get_terms(
-				[
+				array(
 					'taxonomy' => "$taxonomy",
-				]
+				)
 			);
 
 			if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
@@ -2242,6 +2230,29 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 		public function bb_flush_llms_mycourse_ids_cache_user_id( $user_id ) {
 			// Remove the cached course IDs.
 			wp_cache_delete( $user_id, 'llms_mycourse_ids' );
+		}
+
+		/**
+		 * Get selected category.
+		 *
+		 * @since 2.4.10
+		 *
+		 * @return string
+		 */
+		public function get_theme_category() {
+			$llms_taxonomy = buddyboss_theme_get_option( 'lifterlms_course_index_categories_filter_taxonomy' );
+
+			if ( 'llms_course_category' === $llms_taxonomy ) {
+				$taxonomy = 'course_cat';
+			} elseif ( 'llms_course_difficulty' === $llms_taxonomy ) {
+				$taxonomy = 'course_difficulty';
+			} elseif ( 'llms_course_tag' === $llms_taxonomy ) {
+				$taxonomy = 'course_tag';
+			} else {
+				$taxonomy = 'course_track';
+			}
+
+			return $taxonomy;
 		}
 	}
 }

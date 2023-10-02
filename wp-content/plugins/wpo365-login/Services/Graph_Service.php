@@ -178,6 +178,17 @@ if (!class_exists('\Wpo\Services\Graph_Service')) {
                         'sslverify' => $skip_ssl_verify,
                     )
                 );
+            } elseif (WordPress_Helpers::stripos($method, 'PATCH') === 0) {
+                $response = wp_remote_post(
+                    $url,
+                    array(
+                        'body' => $post_fields,
+                        'method' => 'PATCH',
+                        'timeout' => 15,
+                        'headers' => $_headers,
+                        'sslverify' => $skip_ssl_verify,
+                    )
+                );
             } else {
                 return new \WP_Error('NotImplementedException', 'Error occured whilst fetching from Microsoft Graph: Method ' . $method . ' not implemented');
             }

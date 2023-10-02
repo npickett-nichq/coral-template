@@ -3,6 +3,7 @@
 namespace Wpo\Core;
 
 use \Wpo\Core\WordPress_Helpers;
+use Wpo\Services\Log_Service;
 use \Wpo\Services\Options_Service;
 
 // Prevent public access to this script
@@ -54,32 +55,51 @@ if (!class_exists('\Wpo\Core\Script_Helpers')) {
             global $wp_roles;
 
             $extensions = array();
+            $addons = Extensions_Helpers::get_extensions(); // All installed but not necessarily activated extensions
 
-            // Bundles
-            if (class_exists('\Wpo\Premium')) $extensions[] = 'wpo365LoginPremium';
-            if (class_exists('\Wpo\Intranet')) $extensions[] = 'wpo365LoginIntranet';
+            $add_extension = function ($slug, $extension) use (&$extensions, $addons) {
 
-            // Extensions
-            if (class_exists('\Wpo\Apps')) $extensions[] = 'wpo365Apps';
-            if (class_exists('\Wpo\Avatar')) $extensions[] = 'wpo365Avatar';
-            if (class_exists('\Wpo\Custom_Fields')) $extensions[] = 'wpo365CustomFields';
-            if (class_exists('\Wpo\Groups')) $extensions[] = 'wpo365Groups';
-            if (class_exists('\Wpo\Plus')) $extensions[] = 'wpo365LoginPlus';
-            if (class_exists('\Wpo\Professional')) $extensions[] = 'wpo365LoginProfessional';
-            if (class_exists('\Wpo\Mail')) $extensions[] = 'wpo365Mail';
-            if (class_exists('\Wpo\Roles_Access')) $extensions[] = 'wpo365RolesAccess';
-            if (class_exists('\Wpo\Scim')) $extensions[] = 'wpo365Scim';
+                if (!empty($addons[$slug]) && $addons[$slug]['activated']) {
+                    $extensions[] = $extension;
+                }
+            };
 
-            // Plugins
+            $add_extension('wpo365-apps/wpo365-apps.php', 'wpo365Apps');
+            $add_extension('wpo365-avatar/wpo365-avatar.php', 'wpo365Avatar');
+            $add_extension('wpo365-custom-fields/wpo365-custom-fields.php', 'wpo365CustomFields');
+            $add_extension('wpo365-customers/wpo365-customers.php', 'wpo365Customers');
+            $add_extension('wpo365-groups/wpo365-groups.php', 'wpo365Groups');
+            $add_extension('wpo365-intranet-5y/wpo365-intranet-5y.php', 'wpo365Intranet5y');
+            $add_extension('wpo365-login-intranet/wpo365-login.php', 'wpo365LoginIntranet');
+            $add_extension('wpo365-login-plus/wpo365-login.php', 'wpo365LoginPlus');
+            $add_extension('wpo365-login-premium/wpo365-login.php', 'wpo365LoginPremium');
+            $add_extension('wpo365-login-professional/wpo365-login.php', 'wpo365LoginProfessional');
+            $add_extension('wpo365-mail/wpo365-mail.php', 'wpo365Mail');
+            $add_extension('wpo365-roles-access/wpo365-roles-access.php', 'wpo365RolesAccess');
+            $add_extension('wpo365-scim/wpo365-scim.php', 'wpo365Scim');
+            $add_extension('wpo365-sync-5y/wpo365-sync-5y.php', 'wpo365Sync5y');
+
+            // Free plugins
             if (class_exists('\Wpo\Login')) $extensions[] = 'wpo365Login';
             if (class_exists('\Wpo\MsGraphMailer')) $extensions[] = 'wpo365MsGraphMailer';
             if (!empty(get_option('mail_integration_365_plugin_ops'))) $extensions[] = 'mailIntegration';
 
             $itthinx_groups = class_exists('\Wpo\Services\Mapped_Itthinx_Groups_Service') ? \Wpo\Services\Mapped_Itthinx_Groups_Service::get_groups_groups() : array();
             $post_types = get_post_types();
+            $learndash_courses = array();
+            $learndash_groups = array();
+
+            if (class_exists('\Wpo\Services\LearnDash_Integration_Service')) {
+                $learndash_courses = \Wpo\Services\LearnDash_Integration_Service::get_ld_items();
+                $learndash_groups = \Wpo\Services\LearnDash_Integration_Service::get_ld_items('groups');
+            }
+
+            $lic_notices = Wpmu_Helpers::mu_get_transient('wpo365_lic_notices');
 
             $props = array(
                 'adminUrl'           => get_site_url(null, '/wp-admin'),
+                'ldCourses'          => json_encode($learndash_courses),
+                'ldGroups'           => json_encode($learndash_groups),
                 'availableGroups'    => json_encode($itthinx_groups),
                 'availablePostTypes' => json_encode($post_types),
                 'availableRoles'     => json_encode($wp_roles->roles),
@@ -89,6 +109,8 @@ if (!class_exists('\Wpo\Core\Script_Helpers')) {
                 'siteUrl'            => get_home_url(),
                 'wpmu'               => is_multisite() ? (defined('WPO_MU_USE_SUBSITE_OPTIONS') && true === constant('WPO_MU_USE_SUBSITE_OPTIONS') ? 'wpmuDedicated' : 'wpmuShared') : 'wpmuNone',
                 'ina'                => is_network_admin(),
+                'licNotices'         => json_encode($lic_notices),
+                'addOns'             => json_encode($addons),
             );
 
             wp_enqueue_script('wizardjs', trailingslashit($GLOBALS['WPO_CONFIG']['plugin_url']) . 'apps/dist/wizard.js', array(), $GLOBALS['WPO_CONFIG']['version'], true);

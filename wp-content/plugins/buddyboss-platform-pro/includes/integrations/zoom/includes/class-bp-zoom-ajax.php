@@ -415,8 +415,8 @@ if ( ! class_exists( 'BP_Zoom_Ajax' ) ) {
 			$alert                  = bb_pro_filter_input_string( INPUT_POST, 'bp-zoom-meeting-alert' );
 			$notification           = filter_input( INPUT_POST, 'bp-zoom-meeting-notification', FILTER_VALIDATE_BOOLEAN );
 
-			$alternative_host_ids = str_replace( ' ', '', $alternative_host_ids );
-			$alternative_host_ids = explode( ',', $alternative_host_ids );
+			$alternative_host_ids = ! empty( $alternative_host_ids ) ? str_replace( ' ', '', $alternative_host_ids ) : '';
+			$alternative_host_ids = ! empty( $alternative_host_ids ) ? explode( ',', $alternative_host_ids ) : array();
 
 			if ( 1 === (int) $host_type && $auto_recording ) {
 				$auto_recording = 'local';
@@ -1101,7 +1101,7 @@ if ( ! class_exists( 'BP_Zoom_Ajax' ) ) {
 
 				$host_email      = bb_zoom_group_get_email_account( $group_id );
 				$host_type       = bb_zoom_group_get_host_type( $group_id );
-				$webinar_enabled = groups_get_groupmeta( $group_id, 'bp-group-zoom-enable-webinar', true );
+				$webinar_enabled = bp_zoom_groups_is_webinars_enabled( $group_id );
 
 				if ( empty( $webinar_enabled ) ) {
 					wp_send_json_error( array( 'error' => __( 'Webinars not allowed in this group.', 'buddyboss-pro' ) ) );
@@ -2135,7 +2135,6 @@ if ( ! class_exists( 'BP_Zoom_Ajax' ) ) {
 						'account_email' => $account_email,
 						'secret_token'  => groups_get_groupmeta( $group_id, 'bb-group-zoom-s2s-secret-token' ),
 						'group_id'      => $group_id,
-						'old_api_email' => groups_get_groupmeta( $group_id, 'bp-group-zoom-api-email' ),
 					)
 				);
 

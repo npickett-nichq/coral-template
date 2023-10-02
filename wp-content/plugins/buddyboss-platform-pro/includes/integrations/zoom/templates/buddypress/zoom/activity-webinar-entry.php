@@ -254,7 +254,6 @@ $webinar_date_unix = $webinar_date_obj->format( 'U' );
 				$can_host = bp_zoom_can_current_user_start_webinar( bp_get_zoom_webinar_id() );
 
 				if (
-					bb_zoom_group_show_join_browser_button( bp_get_zoom_webinar_group_id() ) &&
 					! empty( $browser_credential['sign'] ) &&
 					! $can_host &&
 					! bp_get_zoom_webinar_authentication() &&

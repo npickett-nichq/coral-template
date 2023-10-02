@@ -24,6 +24,7 @@ if (!class_exists('\Wpo\Services\Error_Service')) {
         const ID_TOKEN_ERROR    = 'ID_TOKEN_ERROR';
         const ID_TOKEN_AUD      = 'ID_TOKEN_AUD';
         const LOGGED_OUT        = 'LOGGED_OUT';
+        const PRIVATE_PAGE      = 'PRIVATE_PAGE';
         const NOT_CONFIGURED    = 'NOT_CONFIGURED';
         const NOT_FROM_DOMAIN   = 'NOT_FROM_DOMAIN';
         const NOT_IN_GROUP      = 'NOT_IN_GROUP';
@@ -102,6 +103,7 @@ if (!class_exists('\Wpo\Services\Error_Service')) {
                 self::ID_TOKEN_ERROR    => __('Your ID token could not be processed. Please contact your System Administrator.', 'wpo365-login'),
                 self::ID_TOKEN_AUD      => __('The ID token is intended for a different audience. Please contact your System Administrator.', 'wpo365_login'),
                 self::LOGGED_OUT        => __('You are now logged out.', 'wpo365-login'),
+                self::PRIVATE_PAGE      => __('The page you requested requires you to sign in first.', 'wpo365-login'),
                 self::NOT_CONFIGURED    => __('Wordpress + Office 365 login not configured yet. Please contact your System Administrator.', 'wpo365-login'),
                 self::NOT_FROM_DOMAIN   => __('Access Denied. Please contact your System Administrator.', 'wpo365-login'),
                 self::NOT_IN_GROUP      => __('Access Denied. Please contact your System Administrator.', 'wpo365-login'),
@@ -137,6 +139,8 @@ if (!class_exists('\Wpo\Services\Error_Service')) {
 
                     if (Options_Service::get_global_boolean_var('use_b2c') &&  \class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
                         $oauth_url = \Wpo\Services\Id_Token_Service_B2c::get_openidconnect_url(null, $redirect_to);
+                    } else if (Options_Service::get_global_boolean_var('use_ciam')) {
+                        $oauth_url = \Wpo\Services\Id_Token_Service_Ciam::get_openidconnect_url(null, $redirect_to);
                     } else {
                         $oauth_url = Id_Token_Service::get_openidconnect_url(null, $redirect_to);
                     }

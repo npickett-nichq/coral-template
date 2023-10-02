@@ -139,7 +139,7 @@ if (!class_exists('\Wpo\Services\Log_Service')) {
             $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
             $request_log = $request->get_item('request_log');
 
-            $ai_items = array_map('self::to_ai', $request_log['log']);
+            $ai_items = array_map('\Wpo\Services\Log_Service::to_ai', $request_log['log']);
             $body = \json_encode($ai_items, JSON_UNESCAPED_UNICODE);
 
             $headersArray = array(

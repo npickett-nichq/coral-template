@@ -272,7 +272,6 @@ if (!class_exists('\Wpo\Graph\Request')) {
             if (Options_Service::get_global_boolean_var('graph_allow_all_endpoints')) {
                 return true;
             } else {
-
                 if (WordPress_Helpers::stripos($endpoint, '/') === 0) {
                     $endpoint = sprintf('https://graph.microsoft.com/_%s', $endpoint);
                 }

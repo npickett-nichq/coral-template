@@ -343,9 +343,24 @@ if (!class_exists('\Wpo\Core\Url_Helpers')) {
                 $redirect_url = self::get_redirect_url($redirect_url);
             }
 
+            /**
+             * @since 24.0 Filters the necessity of conducting the URL check below.
+             */
+
+            if (true === apply_filters('wpo365/url_check/skip', false)) {
+                self::force_redirect($redirect_url);
+            }
+
+            $aad_redirect_uri = Options_Service::get_aad_option('redirect_url');
             $aad_redirect_url = Options_Service::get_global_boolean_var('use_saml')
                 ? Options_Service::get_global_string_var('saml_sp_acs_url')
-                : Options_Service::get_aad_option('redirect_url');
+                : $aad_redirect_uri;
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            $aad_redirect_uri = apply_filters('wpo365/aad/redirect_uri', $aad_redirect_uri);
 
             if (WordPress_Helpers::stripos($aad_redirect_url, 'https://') !== false && WordPress_Helpers::stripos($redirect_url, 'http://') === 0) {
                 Log_Service::write_log('WARN', __METHOD__ . ' -> Please update your htaccess or similar and ensure that users can only access your website via https:// (URL requested by the user: ' . $redirect_url . ').');

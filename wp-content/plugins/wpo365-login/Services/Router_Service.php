@@ -73,9 +73,23 @@ if (!class_exists('\Wpo\Services\Router_Service')) {
             // check for user sync start request via external link
             if (!empty($_REQUEST['wpo365_sync_run']) && $_REQUEST['wpo365_sync_run'] == 'start') {
 
-                if (class_exists('\Wpo\Sync\SyncV2_Service') && !empty($_REQUEST['job_id'])) {
-                    \Wpo\Sync\SyncV2_Service::sync_users(sanitize_text_field($_REQUEST['job_id']));
-                    exit();
+                if (!empty($_REQUEST['job_id'])) {
+
+                    if (isset($_REQUEST['type']) && $_REQUEST['type'] == 'wpToAad') {
+
+                        if (class_exists('\Wpo\Sync\Sync_Wp_To_Aad_Service')) {
+                            \Wpo\Sync\Sync_Wp_To_Aad_Service::sync_users(sanitize_text_field($_REQUEST['job_id']));
+                            exit();
+                        }
+
+                        Log_Service::write_log('WARN', sprintf('%s -> Could not start a WP to AAD User synchronization job because the required classes are not installed', __METHOD__));
+                        exit();
+                    }
+
+                    if (class_exists('\Wpo\Sync\SyncV2_Service')) {
+                        \Wpo\Sync\SyncV2_Service::sync_users(sanitize_text_field($_REQUEST['job_id']));
+                        exit();
+                    }
                 }
             }
 
@@ -175,6 +189,8 @@ if (!class_exists('\Wpo\Services\Router_Service')) {
 
                 if (Options_Service::get_global_boolean_var('use_b2c') &&  \class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
                     $authUrl = \Wpo\Services\Id_Token_Service_B2c::get_openidconnect_url($login_hint, $redirect_to, $b2c_policy);
+                } else if (Options_Service::get_global_boolean_var('use_ciam')) {
+                    $authUrl = \Wpo\Services\Id_Token_Service_Ciam::get_openidconnect_url($login_hint, $redirect_to);
                 } else {
                     $authUrl = Id_Token_Service::get_openidconnect_url($login_hint, $redirect_to);
                 }
@@ -269,6 +285,8 @@ if (!class_exists('\Wpo\Services\Router_Service')) {
             if (strcasecmp(Options_Service::get_global_string_var('oidc_flow'), 'code') === 0) {
                 if (Options_Service::get_global_boolean_var('use_b2c')) {
                     \Wpo\Services\Id_Token_Service_B2c::process_openidconnect_code();
+                } else if (Options_Service::get_global_boolean_var('use_ciam')) {
+                    \Wpo\Services\Id_Token_Service_Ciam::process_openidconnect_code();
                 } else {
                     \Wpo\Services\Id_Token_Service::process_openidconnect_code();
                 }
@@ -378,6 +396,13 @@ if (!class_exists('\Wpo\Services\Router_Service')) {
             $url = urldecode($url);
             $url = wp_sanitize_redirect($url);
             $query = parse_url($url, PHP_URL_QUERY);
+
+            if (empty($query)) {
+                $result = array();
+            } else {
+                parse_str($query, $result);
+            }
+
             parse_str($query, $result);
 
             if (isset($result['mode'])) {

@@ -86,13 +86,16 @@ jQuery(
 							}
 						}
 
-						if ( reply_list_item != '' ) {
-							$( 'body' ).animate(
-								{
-									scrollTop: $( '#post-' + response.reply_id ).offset().top
-								},
-								500
-							);
+						if ( '' !== reply_list_item ) {
+
+							if ( 0 < $( '#post-' + response.reply_id ).length ) {
+								$( 'body' ).animate(
+									{
+										scrollTop: $( '#post-' + response.reply_id ).offset().top
+									},
+									500
+								);
+							}
 							setTimeout(
 								function () {
 									$( reply_list_item ).removeClass( 'highlight' );

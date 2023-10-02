@@ -12,6 +12,7 @@ defined('ABSPATH') or die();
 
         if (defined('WPO_AUTH_SCENARIO') && constant('WPO_AUTH_SCENARIO') == 'internet') {
             $_site_url = \Wpo\Services\Options_Service::get_aad_option('redirect_url');
+            $_site_url = apply_filters('wpo365/aad/redirect_uri', $_site_url);
         }
 
     ?>

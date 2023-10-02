@@ -102,27 +102,69 @@ $search            = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash(
 						</select>
 					</div>
 
-					<?php if ( ! empty( $category ) || ! empty( $tags ) ) { ?>
+					<?php
+					$category_dropdown         = '';
+					$archive_category_taxonomy = buddyboss_theme()->lifterlms_helper()->get_theme_category();
 
-						<?php if ( ! empty( $category ) ) {
-							$category_str = is_array( $category ) ? implode( ',', $category ) : $category; ?>
-							<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
-						<?php } ?>
-
-						<?php if ( ! empty( $tags ) ) {
-							$tags_str = is_array( $tags ) ? implode( ',', $tags ) : $tags; ?>
+					$tags_array = ! empty( $tags ) ? $tags : array();
+					if (
+						'course_tag' !== $archive_category_taxonomy &&
+						! empty( $tags_array )
+					) {
+						$tags_str = is_array( $tags_array ) ? implode( ',', $tags_array ) : $tags_array;
+						?>
+						<input type="hidden" name="filter-block-tags" value="<?php echo $tags_str; ?>"/>
+						<?php
+					} elseif ( 'course_tag' === $archive_category_taxonomy ) {
+						if ( 1 === count( $tags_array ) ) {
+							$tags_str = is_array( $tags_array ) ? implode( ',', $tags_array ) : $tags_array;
+							?>
 							<input type="hidden" name="filter-block-tags" value="<?php echo $tags_str; ?>"/>
-						<?php } ?>
+							<?php
+						} else {
+							$category_dropdown = buddyboss_theme()->lifterlms_helper()->print_categories_options( array( 'include' => $tags_array ) );
+						}
+					}
 
-					<?php } else { ?>
+					$category_array = ! empty( $category ) ? $category : array();
+					if (
+						'course_cat' !== $archive_category_taxonomy &&
+						! empty( $category_array )
+					) {
+						$category_str = is_array( $category_array ) ? implode( ',', $category_array ) : $category_array;
+						?>
+						<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
+						<?php
+					} elseif ( 'course_cat' === $archive_category_taxonomy ) {
+						if ( 1 === count( $category_array ) ) {
+							$category_str = is_array( $category_array ) ? implode( ',', $category_array ) : $category_array;
+							?>
+							<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
+							<?php
+						} else {
+							$category_dropdown = buddyboss_theme()->lifterlms_helper()->print_categories_options( array( 'include' => $category_array ) );
+						}
+					}
+
+					if (
+						'course_difficulty' === $archive_category_taxonomy ||
+						'course_track' === $archive_category_taxonomy
+					) {
+						$category_dropdown = buddyboss_theme()->lifterlms_helper()->print_categories_options();
+					}
+
+					if ( ! empty( $category_dropdown ) ) {
+						?>
 						<div class="select-wrap <?php echo ! empty( $settings['category_filter'] ) && 'on' === $settings['category_filter'] ? 'active' : 'hide'; ?>">
-							<?php if ( '' !== trim( buddyboss_theme()->lifterlms_helper()->print_categories_options() ) ) { ?>
+							<?php if ( '' !== trim( $category_dropdown ) ) { ?>
 								<select id="sfwd_cats-order-by" name="filter-categories">
-									<?php echo buddyboss_theme()->lifterlms_helper()->print_categories_options(); ?>
+									<?php echo $category_dropdown; ?>
 								</select>
 							<?php } ?>
 						</div>
-					<?php } ?>
+						<?php
+					}
+					?>
 
 					<?php if ( buddyboss_theme_get_option( 'lifterlms_course_index_show_instructors_filter' ) ) : ?>
 						<div class="select-wrap <?php echo ! empty( $settings['instructors_filter'] ) && 'on' === $settings['instructors_filter'] ? 'active' : 'hide'; ?>">

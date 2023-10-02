@@ -37,14 +37,22 @@ if (!class_exists('\Wpo\Services\User_Service')) {
         {
             Log_Service::write_log('DEBUG', '##### -> ' . __METHOD__);
 
+            $preferred_username = '';
+
             if (property_exists($id_token, 'preferred_username') && !empty($id_token->preferred_username)) {
                 $preferred_username = trim(strtolower($id_token->preferred_username));
             } elseif (property_exists($id_token, 'unique_name') && !empty($id_token->unique_name)) {
                 $preferred_username = trim(strtolower($id_token->unique_name));
             }
 
-            if (empty($preferred_username)) {
-                $preferred_username = '';
+            $custom_username = '';
+
+            if (Options_Service::get_global_string_var('user_name_preference') == 'custom') {
+                $username_claim = Options_Service::get_global_string_var('user_name_claim');
+
+                if (!empty($username_claim) && property_exists($id_token, $username_claim)) {
+                    $custom_username = $id_token->$username_claim;
+                }
             }
 
             $upn = isset($id_token->upn)
@@ -86,6 +94,7 @@ if (!class_exists('\Wpo\Services\User_Service')) {
             $wpo_usr->full_name = $full_name;
             $wpo_usr->email = $email;
             $wpo_usr->preferred_username = $preferred_username;
+            $wpo_usr->custom_username = $custom_username;
             $wpo_usr->upn = $upn;
             $wpo_usr->name = $upn;
             $wpo_usr->tid = $tid;
@@ -108,28 +117,35 @@ if (!class_exists('\Wpo\Services\User_Service')) {
 
             // Enrich -> Graph resource for user
             if (!$is_msa && \class_exists('\Wpo\Services\User_Details_Service')) {
-                $resource_identifier = !empty($wpo_usr->oid)
-                    ? $wpo_usr->oid
-                    : (
-                        (!empty($wpo_usr->upn)
-                            ? $wpo_usr->upn
-                            : null)
-                    );
 
-                $graph_resource = \Wpo\Services\User_Details_Service::get_graph_user($resource_identifier);
+                // Either -> Enrich using ID token claims
+                if (Options_Service::get_global_string_var('extra_user_fields_source') == 'idToken') {
+                    \Wpo\Services\User_Details_Service::update_wpo_usr_from_id_token($wpo_usr, $id_token);
+                    // Or -> Enrich using Graph Resource
+                } else {
+                    $resource_identifier = !empty($wpo_usr->oid)
+                        ? $wpo_usr->oid
+                        : (
+                            (!empty($wpo_usr->upn)
+                                ? $wpo_usr->upn
+                                : null)
+                        );
 
-                if (empty($wpo_usr->upn) && is_array($graph_resource) && array_key_exists('userPrincipalName', $graph_resource)) {
-                    $wpo_usr->upn = $graph_resource['userPrincipalName'];
+                    $graph_resource = \Wpo\Services\User_Details_Service::get_graph_user($resource_identifier);
+
+                    if (empty($wpo_usr->upn) && is_array($graph_resource) && array_key_exists('userPrincipalName', $graph_resource)) {
+                        $wpo_usr->upn = $graph_resource['userPrincipalName'];
+                    }
+
+                    $wpo_usr->graph_resource = $graph_resource;
                 }
-
-                $wpo_usr->graph_resource = $graph_resource;
 
                 // Update cached user
                 $request->set_item('wpo_usr', $wpo_usr);
             }
 
             // Enrich -> Azure AD groups
-            if (!$is_msa && empty($wpo_usr->groups) && \class_exists('\Wpo\Services\User_Aad_Groups_Service') && \method_exists('\Wpo\Services\User_Aad_Groups_Service', 'get_aad_groups')) {
+            if (!$is_msa && (empty($wpo_usr->groups) || true === Options_Service::get_global_boolean_var('all_group_memberships')) && \class_exists('\Wpo\Services\User_Aad_Groups_Service') && \method_exists('\Wpo\Services\User_Aad_Groups_Service', 'get_aad_groups')) {
                 \Wpo\Services\User_Aad_Groups_Service::get_aad_groups($wpo_usr);
 
                 // Update cached user
@@ -169,6 +185,16 @@ if (!class_exists('\Wpo\Services\User_Service')) {
 
             $preferred_username = $email;
 
+            $custom_username = '';
+
+            if (Options_Service::get_global_string_var('user_name_preference') == 'custom') {
+                $username_claim = Options_Service::get_global_string_var('user_name_claim');
+
+                if (!empty($username_claim) && property_exists($id_token, $username_claim)) {
+                    $custom_username = $id_token->$username_claim;
+                }
+            }
+
             $upn = isset($id_token->upn)
                 ? WordPress_Helpers::trim(strtolower($id_token->upn))
                 : '';
@@ -204,6 +230,7 @@ if (!class_exists('\Wpo\Services\User_Service')) {
             // $wpo_usr->full_name = $full_name;
             $wpo_usr->email = $email;
             $wpo_usr->preferred_username = $preferred_username;
+            $wpo_usr->custom_username = $custom_username;
             $wpo_usr->upn = $upn;
             $wpo_usr->name = $upn;
             $wpo_usr->tid = $tid;
@@ -351,6 +378,16 @@ if (!class_exists('\Wpo\Services\User_Service')) {
             $tid = Saml2_Service::get_attribute('tid', $saml_attributes);
             $oid = Saml2_Service::get_attribute('objectidentifier', $saml_attributes);
 
+            $custom_username = '';
+
+            if (Options_Service::get_global_string_var('user_name_preference') == 'custom') {
+                $username_claim = Options_Service::get_global_string_var('user_name_claim');
+
+                if (!empty($username_claim)) {
+                    $custom_username = Saml2_Service::get_attribute($username_claim, $saml_attributes);
+                }
+            }
+
             $wpo_usr = new User();
             $wpo_usr->from_idp_token = true;
             $wpo_usr->first_name = $first_name;
@@ -358,6 +395,7 @@ if (!class_exists('\Wpo\Services\User_Service')) {
             $wpo_usr->full_name = $full_name;
             $wpo_usr->email = $email;
             $wpo_usr->preferred_username = $preferred_username;
+            $wpo_usr->custom_username = $custom_username;
             $wpo_usr->upn = $upn;
             $wpo_usr->name = $upn;
             $wpo_usr->tid = $tid;
@@ -523,6 +561,15 @@ if (!class_exists('\Wpo\Services\User_Service')) {
 
                     if (!empty($wpo_usr->email)) {
                         $wp_usr = \get_user_by('email', $wpo_usr->email);
+
+                        if (!empty($wp_usr)) {
+                            return $wp_usr;
+                        }
+                    }
+                } elseif ($field == 'custom') {
+
+                    if (!empty($wpo_usr->custom_username)) {
+                        $wp_usr = \get_user_by('login', $wpo_usr->custom_username);
 
                         if (!empty($wp_usr)) {
                             return $wp_usr;

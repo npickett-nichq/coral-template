@@ -749,30 +749,33 @@ function bp_zoom_webinar_after_save_update_webinar_data( $webinar ) {
 /**
  * Setup webinar on plugin update.
  *
- * @param string $key    API Key.
- * @param string $secret API Secret.
- * @param string $email  API Email.
- *
  * @since 1.0.9
+ *
+ * @param string $client_id     Client ID.
+ * @param string $client_secret Client Secret.
+ * @param string $account_id    Account ID.
  */
-function bp_zoom_pro_setup_webinar_integration( $key = '', $secret = '', $email = '' ) {
-	bp_zoom_conference()->zoom_api_key    = empty( $key ) ? bp_zoom_api_key() : $key;
-	bp_zoom_conference()->zoom_api_secret = empty( $secret ) ? bp_zoom_api_secret() : $secret;
+function bp_zoom_pro_setup_webinar_integration( $account_id = '', $client_id = '', $client_secret = '' ) {
+	bp_zoom_conference()->zoom_api_account_id    = empty( $account_id ) ? bb_zoom_account_id() : $account_id;
+	bp_zoom_conference()->zoom_api_client_id     = empty( $client_id ) ? bb_zoom_client_id() : $client_id;
+	bp_zoom_conference()->zoom_api_client_secret = empty( $client_secret ) ? bb_zoom_client_secret() : $client_secret;
 
-	$email = empty( $email ) ? bp_zoom_api_email() : $email;
+	$email = bb_zoom_account_email();
 
 	if ( ! empty( $email ) ) {
 		$user_info = bp_zoom_conference()->get_user_info( $email );
 
 		if ( 200 === $user_info['code'] ) {
-			bp_update_option( 'bp-zoom-api-host-user', wp_json_encode( $user_info['response'] ) );
+			$settings = bb_get_zoom_block_settings();
+
+			$settings['account_host_user'] = $user_info['response'];
 
 			// Get user settings of host user.
 			$user_settings = bp_zoom_conference()->get_user_settings( $user_info['response']->id );
 
 			// Save user settings into group meta.
 			if ( 200 === $user_settings['code'] && ! empty( $user_settings['response'] ) ) {
-				bp_update_option( 'bp-zoom-api-host-user-settings', wp_json_encode( $user_settings['response'] ) );
+				$settings['account_host_user_settings'] = $user_settings['response'];
 
 				if ( isset( $user_settings['response']->feature->webinar ) && true === $user_settings['response']->feature->webinar ) {
 					bp_update_option( 'bp-zoom-enable-webinar', true );
@@ -780,9 +783,11 @@ function bp_zoom_pro_setup_webinar_integration( $key = '', $secret = '', $email 
 					bp_delete_option( 'bp-zoom-enable-webinar' );
 				}
 			} else {
-				bp_delete_option( 'bp-zoom-api-host-user-settings' );
-				bp_delete_option( 'bp-zoom-enable-webinar' );
+				$settings['account_host_user']          = array();
+				$settings['account_host_user_settings'] = array();
 			}
+
+			bp_update_option( 'bb-zoom', $settings );
 		}
 	}
 }

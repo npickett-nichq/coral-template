@@ -93,6 +93,13 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
                 return new \WP_Error('1025', $warning);
             }
 
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            $redirect_uri = Options_Service::get_aad_option('redirect_url');
+            $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
+
             if (WordPress_Helpers::stripos($scope, 'https://analysis.windows.net/powerbi/api/.default') === 0) {
                 $params = array(
                     'client_id' => Options_Service::get_aad_option('application_id'),
@@ -105,7 +112,7 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
                 $params = array(
                     'client_id' => Options_Service::get_aad_option('application_id'),
                     'client_secret' => Options_Service::get_aad_option('application_secret'),
-                    'redirect_uri' => Options_Service::get_aad_option('redirect_url'),
+                    'redirect_uri' => $redirect_uri,
                     'scope' =>  'offline_access ' . $scope,
                 );
             }
@@ -414,6 +421,26 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
         {
             Log_Service::write_log('DEBUG', '##### -> ' . __METHOD__);
 
+            $use_mail_config = false;
+
+            if (
+                Options_Service::get_global_boolean_var('use_graph_mailer')
+                && !empty($role)
+                && (false !== WordPress_Helpers::stripos($role, 'Mail.Send') || false !== WordPress_Helpers::stripos($role, 'Mail.ReadWrite'))
+            ) {
+                $mail_directory_id = Options_Service::get_aad_option('mail_tenant_id');
+                $mail_application_id = Options_Service::get_aad_option('mail_application_id');
+                $mail_application_secret = Options_Service::get_aad_option('mail_application_secret');
+
+                if (!empty($mail_directory_id) && !empty($mail_application_id) && !empty($mail_application_secret)) {
+                    $use_mail_config = true;
+                }
+            }
+
+            $directory_id = $use_mail_config ? $mail_directory_id : Options_Service::get_aad_option('tenant_id');
+            $application_id = $use_mail_config ? $mail_application_id : Options_Service::get_aad_option('app_only_application_id');
+            $application_secret = $use_mail_config ? $mail_application_secret : Options_Service::get_aad_option('app_only_application_secret');
+
             // Tokens are stored by default as user metadata
             $cached_access_tokens_json = get_option(self::SITE_META_ACCESS_TOKEN);
 
@@ -429,6 +456,17 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
                     $cached_access_token_result = null;
 
                     foreach ($cached_access_tokens as $key => $cached_access_token) {
+                        if (!\property_exists($cached_access_token, 'audience')) {
+                            unset($cached_access_tokens[$key]);
+                            Log_Service::write_log('DEBUG', __METHOD__ . ' -> Deleted an app-only access token without an audience.');
+                            continue;
+                        }
+
+                        if (strcasecmp($cached_access_token->audience, $application_id) !== 0) {
+                            Log_Service::write_log('DEBUG', __METHOD__ . ' -> App-only access token for a different audience.');
+                            continue;
+                        }
+
                         // Valid app only token is expired
                         if (isset($cached_access_token->expiry) && intval($cached_access_token->expiry) < time()) {
                             unset($cached_access_tokens[$key]);
@@ -466,28 +504,6 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
                         return $cached_access_token_result;
                     }
                 }
-            }
-
-            if (
-                Options_Service::get_global_boolean_var('use_graph_mailer')
-                && !empty($role)
-                && (false !== WordPress_Helpers::stripos($role, 'Mail.Send') || false !== WordPress_Helpers::stripos($role, 'Mail.ReadWrite'))
-            ) {
-                $directory_id = Options_Service::get_aad_option('mail_tenant_id');
-                $application_id = Options_Service::get_aad_option('mail_application_id');
-                $application_secret = Options_Service::get_aad_option('mail_application_secret');
-            }
-
-            if (empty($directory_id)) {
-                $directory_id = Options_Service::get_aad_option('tenant_id');
-            }
-
-            if (empty($application_id)) {
-                $application_id = Options_Service::get_aad_option('app_only_application_id');
-            }
-
-            if (empty($application_secret)) {
-                $application_secret = Options_Service::get_aad_option('app_only_application_secret');
             }
 
             $params = array(
@@ -532,7 +548,8 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
                 return new \WP_Error($access_token->get_error_code(), $warning);
             }
 
-            // Store the new token as user meta with the shorter ttl of both auth and token
+            // Store the new token as a site option with the shorter ttl of both auth and token
+            $access_token->audience = $application_id;
             $access_token->expiry = time() + intval($access_token->expires_in);
             $access_token->scope = $scope;
             $access_token->roles = self::get_application_roles($access_token->access_token);

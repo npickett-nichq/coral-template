@@ -35,7 +35,13 @@ if (!class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
             $domain_name = Options_Service::get_global_string_var('b2c_domain_name');
             $oidc_flow = Options_Service::get_global_string_var('oidc_flow');
             $policy = empty($b2c_policy) || !Options_Service::get_global_boolean_var('b2c_allow_multiple_policies') ? Options_Service::get_global_string_var('b2c_policy_name') : $b2c_policy;
-            $redirect_url = Options_Service::get_aad_option('redirect_url');
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            $redirect_uri = Options_Service::get_aad_option('redirect_url');
+            $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
 
             /**
              * @since   20.x    Support for custom b2c login domain e.g. login.contoso.com
@@ -64,7 +70,7 @@ if (!class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
                 'client_id'     => $application_id,
                 'nonce'         => Nonce_Service::create_nonce(),
                 'p'             => $policy,
-                'redirect_uri'  => $redirect_url,
+                'redirect_uri'  => $redirect_uri,
                 'response_mode' => 'form_post',
                 'scope'         => "openid email profile $application_id",
                 'state'         => $redirect_to,
@@ -90,6 +96,29 @@ if (!class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
         }
 
         /**
+         * Gets an OpenID Connect authorization URL for the configured sign-up end point.
+         * 
+         * @since 24.0
+         * 
+         * @param string $register 
+         * @return string 
+         */
+        public static function get_registration_url($register)
+        {
+            if (!Options_Service::get_global_boolean_var('b2c_enable_signup')) {
+                return $register;
+            }
+
+            $policy = Options_Service::get_global_string_var('b2c_signup_policy');
+
+            if (empty($policy)) {
+                return $register;
+            }
+
+            return self::get_openidconnect_url(null, null, $policy);
+        }
+
+        /**
          * Helper to process the authorization code which is then used to request an ID and access token.
          * 
          * @since   18.0
@@ -112,7 +141,14 @@ if (!class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
             $application_id = Options_Service::get_aad_option('application_id');
             $application_secret = Options_Service::get_aad_option('application_secret');
             $domain_name = Options_Service::get_global_string_var('b2c_domain_name');
-            $redirect_url = Options_Service::get_aad_option('redirect_url');
+
+
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
+            $redirect_uri = Options_Service::get_aad_option('redirect_url');
+            $redirect_uri = apply_filters('wpo365/aad/redirect_uri', $redirect_uri);
 
             /**
              * @since   20.x    Support for custom b2c login domain e.g. login.contoso.com
@@ -139,7 +175,7 @@ if (!class_exists('\Wpo\Services\Id_Token_Service_B2c')) {
             $params = array(
                 'client_id'     => $application_id,
                 'response_type' => 'token',
-                'redirect_uri'  => $redirect_url,
+                'redirect_uri'  => $redirect_uri,
                 'response_mode' => 'form_post',
                 'scope'         => "openid email profile offline_access $application_id",
                 'grant_type'    => 'authorization_code',

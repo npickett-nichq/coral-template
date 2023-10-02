@@ -212,19 +212,6 @@ class Plugin_Updater
             ? network_admin_url('admin.php?page=wpo365-manage-licenses')
             : admin_url('admin.php?page=wpo365-manage-licenses');
 
-        // Generate warning if license was not found
-        if (empty($license_key)) {
-            $lic_notices[] = \sprintf(
-                'Could not find a license for <strong>%s</strong>. Please go to <a href="%s">WP Admin > WPO365 > Licenses</a> and activate your license or purchase a <a href="%s" target="_blank">new license online</a>. See the <a href="%s" target="_blank">End User License Agreement</a> for details',
-                $extension['store_item'],
-                $lic_url,
-                $extension['store_url'],
-                'https://www.wpo365.com/end-user-license-agreement/'
-            );
-            Wpmu_Helpers::mu_set_transient('wpo365_lic_notices', $lic_notices);
-            return;
-        }
-
         $empty_url_arg = empty($url);
 
         if ($empty_url_arg) {
@@ -290,6 +277,19 @@ class Plugin_Updater
             $extension['store_item'],
             $url
         ));
+
+        // Generate warning if license was not found
+        if (empty($license_key)) {
+            $lic_notices[] = \sprintf(
+                'Could not find a license for <strong>%s</strong>. Please go to <a href="%s">WP Admin > WPO365 > Licenses</a> and activate your license or purchase a <a href="%s" target="_blank">new license online</a>. See the <a href="%s" target="_blank">End User License Agreement</a> for details',
+                $extension['store_item'],
+                $lic_url,
+                $extension['store_url'],
+                'https://www.wpo365.com/end-user-license-agreement/'
+            );
+            Wpmu_Helpers::mu_set_transient('wpo365_lic_notices', $lic_notices);
+            return;
+        }
 
         // Call the custom API.
         $response = wp_remote_get(\sprintf("https://www.wpo365.com/?edd_action=check_license&license=%s&item_id=%s&url=%s", $license_key, $extension['store_item_id'], $url), array('timeout' => 15, 'sslverify' => false));

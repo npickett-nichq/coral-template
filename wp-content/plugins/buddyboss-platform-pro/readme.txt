@@ -3,7 +3,7 @@ Contributors: buddyboss
 Requires at least: 4.9.1
 Tested up to: 6.2.2
 Requires PHP: 5.6.20
-Stable tag: 2.4.00
+Stable tag: 2.4.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,6 +31,12 @@ To run BuddyBoss Platform Pro, we recommend your host supports:
 5. Activate 'BuddyBoss Platform Pro' from your Plugins page.
 
 == Changelog ==
+
+= 2.4.20 =
+* Enhancement: Zoom - Remove Reference to Zoom JWT depreciation and any warnings, tabs and configuration
+
+= 2.4.10 =
+* Enhancement: Core - The Background Process working when suspending and un-suspending users got stuck creating an infinite loop
 
 = 2.4.00 =
 * Bug: LearnDash - Group Users could not send private messages to the LearnDash Group Leaders

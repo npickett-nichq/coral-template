@@ -2,7 +2,7 @@
 Contributors: BuddyBoss
 Requires at least: 4.9.1
 Tested up to: 6.2.2
-Version: 2.4.00
+Version: 2.4.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,27 @@ BuddyBoss Theme is a community theme for the BuddyBoss Platform.
 4. Upload the file 'buddyboss-theme-child.zip'
 
 == Changelog ==
+
+= 2.4.20 =
+* Bug: Activity - When quick replying to forum discussion within the Activity Feed a console error would show
+* Bug: Core - "View Profile" button was only partly clickable
+* Bug: Core - Pagination problem occurred on pages where the group type shortcode was used
+* Bug: LearnDash - Lesson & Materials tab in LearnDash Lesson was duplicating when using Elementor Pro single lesson template and LearnDash Elementor plugin
+* Bug: LearnDash - Quiz Summary, highlighted numbered question were not maintaining the correct ratio
+* Bug: Profiles - Removed Google+ from 'Social Networks' profile field
+* Bug: Profiles - Update Twitter name to X on all Social Links
+
+= 2.4.10 =
+* Bug: Core - SEO compatible changes made to single course page header
+* Bug: Elementor - Elementor 'Course Grid' widget's category filter was not functioning as it should
+* Bug: Elementor - Elementor ‘Course Grid' widget's 'category filter’ control was not showing in the control section
+* Bug: Forums - Multilevel Forums were not displaying correctly on BB Forums List widget.
+* Bug: Forums - The shortcode for ‘new topic’, the modal pop up had UI issues
+* Bug: Groups - Logged out users clicking ‘Create Group’ now redirects the user back to the login page
+* Bug: Notifications - Organizers were not receiving Email Notifications for forum discussions
+
+= 2.4.01 =
+* New Feature! - This new 'Restrict Registration' feature allows you to restrict or allow specific email or domains from registering on your site
 
 = 2.4.00 =
 * Enhancement: LearnDash - Added LearnDash 4.7.0 support for Challenge Exams, Course Student Limits and Start/End enrolment restrictions

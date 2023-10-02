@@ -31,6 +31,7 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
         private $no_sso = false;
         private $use_saml = false;
         private $use_b2c = false;
+        private $use_ciam = false;
         private $graph_version_beta = false;
         private $extensions = [];
         private $request = null;
@@ -43,6 +44,7 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
             $this->no_sso = Options_Service::get_global_boolean_var('no_sso');
             $this->use_saml = Options_Service::get_global_boolean_var('use_saml');
             $this->use_b2c = Options_Service::get_global_boolean_var('use_b2c');
+            $this->use_ciam = Options_Service::get_global_boolean_var('use_ciam');
             $this->graph_version_beta = Options_Service::get_global_string_var('graph_version') == 'beta';
             $extensions = Extensions_Helpers::get_extensions();
 
@@ -64,7 +66,10 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
 
             if ($this->no_sso) {
                 $queries = array();
-                parse_str($_SERVER['QUERY_STRING'], $queries);
+
+                if (!empty($_SERVER['QUERY_STRING'])) {
+                    parse_str($_SERVER['QUERY_STRING'], $queries);
+                }
 
                 if (isset($queries['upn'])) {
                     $upn = filter_var($queries['upn'], FILTER_SANITIZE_EMAIL);
@@ -249,7 +254,8 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                     'wpo365-custom-fields/wpo365-custom-fields.php',
                     'wpo365-groups/wpo365-groups.php',
                     'wpo365-roles-access/wpo365-roles-access.php',
-                    'wpo365-scim/wpo365-scim.php'
+                    'wpo365-scim/wpo365-scim.php',
+                    'wpo365-customers/wpo365-customers.php',
                 )
             );
 
@@ -333,7 +339,8 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                     'wpo365-custom-fields/wpo365-custom-fields.php',
                     'wpo365-groups/wpo365-groups.php',
                     'wpo365-roles-access/wpo365-roles-access.php',
-                    'wpo365-scim/wpo365-scim.php'
+                    'wpo365-scim/wpo365-scim.php',
+                    'wpo365-customers/wpo365-customers.php',
                 )
             );
 
@@ -1026,7 +1033,7 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
             $test_result = new Test_Result('Synchronize users with <em>delegated</em> permissions.', Test_Result::CAPABILITY_SYNC, Test_Result::SEVERITY_LOW);
             $test_result->passed = true;
 
-            $suitable_extensions = \array_flip(array('wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php'));
+            $suitable_extensions = \array_flip(array('wpo365-customers/wpo365-customers.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php'));
 
             // Check if suitable extensions can be found
             if (sizeof($this->extensions) === 0 || sizeof(\array_intersect_key($suitable_extensions, $this->extensions)) === 0) {
@@ -1230,7 +1237,7 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
             $test_result = new Test_Result('Synchronize users with <em>application</em> permissions (required when you want to schedule user synchronization).', Test_Result::CAPABILITY_SYNC, Test_Result::SEVERITY_LOW);
             $test_result->passed = true;
 
-            $suitable_extensions = \array_flip(array('wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php'));
+            $suitable_extensions = \array_flip(array('wpo365-customers/wpo365-customers.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php'));
 
             // Check if suitable extensions can be found
             if (sizeof($this->extensions) === 0 || sizeof(\array_intersect_key($suitable_extensions, $this->extensions)) === 0) {

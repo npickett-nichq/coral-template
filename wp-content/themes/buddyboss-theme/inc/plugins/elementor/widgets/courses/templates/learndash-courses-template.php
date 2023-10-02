@@ -89,27 +89,70 @@ $courses_label = LearnDash_Custom_Label::get_label( 'courses' );
 						</select>
 					</div>
 
-					<?php if ( ! empty( $category ) || ! empty( $tags ) ) { ?>
+					<?php
+					$archive_category_taxonomy = buddyboss_theme_get_option( 'learndash_course_index_categories_filter_taxonomy' );
+					if ( empty( $archive_category_taxonomy ) ) {
+						$archive_category_taxonomy = 'ld_course_category';
+					}
 
-						<?php if ( ! empty( $category ) ) {
-							$category_str = is_array( $category ) ? implode( ',', $category ) : $category; ?>
-							<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
-						<?php } ?>
-
-						<?php if ( ! empty( $tags ) ) {
-							$tags_str = is_array( $tags ) ? implode( ',', $tags ) : $tags; ?>
+					$tags_array = ! empty( $tags ) ? $tags : array();
+					if (
+						'ld_course_tag' !== $archive_category_taxonomy &&
+						! empty( $tags_array )
+					) {
+						$tags_str = is_array( $tags_array ) ? implode( ',', $tags_array ) : $tags_array;
+						?>
+						<input type="hidden" name="filter-block-tags" value="<?php echo $tags_str; ?>"/>
+						<?php
+					} elseif( 'ld_course_tag' === $archive_category_taxonomy ) {
+						if ( 1 === count( $tags_array ) ) {
+							$tags_str = is_array( $tags_array ) ? implode( ',', $tags_array ) : $tags_array;
+							?>
 							<input type="hidden" name="filter-block-tags" value="<?php echo $tags_str; ?>"/>
-						<?php } ?>
+							<?php
+						} else {
+							$category_dropdown = buddyboss_theme()->learndash_helper()->print_categories_options( array( 'include' => $tags_array ) );
+							?>
+							<div class="select-wrap <?php echo ! empty( $settings['category_filter'] ) && 'on' === $settings['category_filter'] ? 'active' : 'hide'; ?>">
+								<?php if ( '' !== trim( $category_dropdown ) ) { ?>
+									<select id="sfwd_cats-order-by" name="filter-categories">
+										<?php echo $category_dropdown; ?>
+									</select>
+								<?php } ?>
+							</div>
+							<?php
+						}
+					}
 
-					<?php } else { ?>
-						<div class="select-wrap <?php echo ! empty( $settings['category_filter'] ) && 'on' === $settings['category_filter'] ? 'active' : 'hide'; ?>">
-							<?php if ( '' !== trim( buddyboss_theme()->learndash_helper()->print_categories_options() ) ) { ?>
-								<select id="sfwd_cats-order-by" name="filter-categories">
-									<?php echo buddyboss_theme()->learndash_helper()->print_categories_options(); ?>
-								</select>
-							<?php } ?>
-						</div>
-					<?php } ?>
+					$category_array = ! empty( $category ) ? $category : array();
+					if (
+						'ld_course_category' !== $archive_category_taxonomy &&
+						! empty( $category_array )
+					) {
+						$category_str = is_array( $category_array ) ? implode( ',', $category_array ) : $category_array;
+						?>
+						<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
+						<?php
+					} elseif ( 'ld_course_category' === $archive_category_taxonomy ) {
+						if ( 1 === count( $category_array ) ) {
+							$category_str = is_array( $category_array ) ? implode( ',', $category_array ) : $category_array;
+							?>
+							<input type="hidden" name="filter-block-categories" value="<?php echo $category_str; ?>"/>
+							<?php
+						} else {
+							$category_dropdown = buddyboss_theme()->learndash_helper()->print_categories_options( array( 'include' => $category_array ) );
+							?>
+							<div class="select-wrap <?php echo ! empty( $settings['category_filter'] ) && 'on' === $settings['category_filter'] ? 'active' : 'hide'; ?>">
+								<?php if ( '' !== trim( $category_dropdown ) ) { ?>
+									<select id="sfwd_cats-order-by" name="filter-categories">
+										<?php echo $category_dropdown; ?>
+									</select>
+								<?php } ?>
+							</div>
+							<?php
+						}
+					}
+					?>
 
 					<div class="select-wrap <?php echo ! empty( $settings['instructors_filter'] ) && 'on' === $settings['instructors_filter'] ? 'active' : 'hide'; ?>">
 						<select id="sfwd_instructors-order-by" name="filter-instructors">

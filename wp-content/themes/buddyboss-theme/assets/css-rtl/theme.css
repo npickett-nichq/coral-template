@@ -6149,6 +6149,9 @@ a.custom-logo-link {
 .header-aside .user-wrap.user-wrap-container {
   margin-right: 10px;
 }
+.header-aside.avatar {
+  aspect-ratio: auto;
+}
 .site-header .header-aside.avatar .sub-menu {
   left: 0;
 }
@@ -9821,9 +9824,19 @@ body:not(.buddypanel-open).bb-sfwd-aside .buddypanel-site-icon {
   margin-top: 8px;
   margin-bottom: 0;
   margin-right: 23px;
+  max-width: 100%;
 }
 .widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums li {
   margin: 3.5px 0;
+}
+.widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums .bbp-forums-list {
+  margin-right: 0;
+  max-width: 100%;
+}
+.widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums .bbp-sub-forum > .bbp-forums-list,
+.widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums .bbp-sub-forum > .bbp-forums-list > li > .bbp-forums-list,
+.widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums .bbp-sub-forum > .bbp-forums-list > li > .bbp-forums-list > li > .bbp-forums-list {
+  margin-right: 10px;
 }
 .widget.widget_display_forums .bb-sidebar-forums li .bb-sidebar-forums .bbp-forum-link:before {
   display: none;
@@ -9946,6 +9959,9 @@ body:not(.buddypanel-open).bb-sfwd-aside .buddypanel-site-icon {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  row-gap: 8px;
 }
 .widget.widget_follow_us .bb-follow-links a {
   opacity: 0.3;

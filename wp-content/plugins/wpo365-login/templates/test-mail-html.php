@@ -97,7 +97,7 @@ defined('ABSPATH') or die();
                                                                             <p>Marco van Wieren, Downloads by van Wieren</p>
                                                                             <p>WPO365 - Connecting WordPress and Microsoft Office 365 / Azure AD</p>
                                                                             <p>Zurich, Switzerland</p>
-                                                                            <p>t https://twitter.com/WPO365</p>
+                                                                            <p>l https://www.linkedin.com/company/downloads-by-van-wieren</p>
                                                                             <p>w https://www.wpo365.com</p>
                                                                             <p>e support@wpo365.com</p>
                                                                         </div>

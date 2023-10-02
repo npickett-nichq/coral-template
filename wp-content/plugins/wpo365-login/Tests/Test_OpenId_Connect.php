@@ -100,7 +100,12 @@ if (!class_exists('\Wpo\Tests\Test_OpenId_Connect')) {
             $test_result = new Test_Result('Redirect URL has been configured', Test_Result::CAPABILITY_OIC_SSO, Test_Result::SEVERITY_BLOCKING);
             $test_result->passed = true;
 
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
             $redirect_url = Options_Service::get_aad_option('redirect_url');
+            $redirect_url = apply_filters('wpo365/aad/redirect_uri', $redirect_url);
 
             if (empty($redirect_url)) {
                 $test_result->passed = false;
@@ -225,8 +230,9 @@ if (!class_exists('\Wpo\Tests\Test_OpenId_Connect')) {
             }
 
             $request_service = Request_Service::get_instance();
-            $this->request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
-            $this->request->set_item('wpo_usr', User_Service::user_from_id_token($this->id_token));
+            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
+            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
+            $request->set_item('wpo_usr', User_Service::user_from_id_token($this->id_token));
         }
     }
 }

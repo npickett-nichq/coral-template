@@ -108,7 +108,7 @@ if (!class_exists('\Wpo\Core\Shortcode_Helpers')) {
 
             // Load the js dependency
             ob_start();
-            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php')) . '/templates/openid-ssolink.php');
+            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-premium/wpo365-login.php', 'wpo365-sync-5y/wpo365-sync-5y.php', 'wpo365-login-intranet/wpo365-login.php', 'wpo365-intranet-5y/wpo365-intranet-5y.php')) . '/templates/openid-ssolink.php');
             $js_lib = ob_get_clean();
 
             // Sanitize the HTML template
@@ -206,7 +206,7 @@ if (!class_exists('\Wpo\Core\Shortcode_Helpers')) {
             }
 
             ob_start();
-            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-professional/wpo365-login.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-login-intranet/wpo365-login.php')) . '/templates/error-message.php');
+            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-professional/wpo365-login.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-sync-5y/wpo365-sync-5y.php', 'wpo365-login-intranet/wpo365-login.php', 'wpo365-intranet-5y/wpo365-intranet-5y.php', 'wpo365-customers/wpo365-customers.php')) . '/templates/error-message.php');
             $content = ob_get_clean();
             return wp_kses($content, WordPress_Helpers::get_allowed_html());
         }

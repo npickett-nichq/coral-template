@@ -97,7 +97,6 @@ if (!class_exists('\Wpo\Tests\Test_B2c')) {
                 $test_result->passed = false;
                 $test_result->message = "An <em>Application (Client) Secret</em> is needed for the selected <em>OpenID Connect Flow (Auth.-Code)</em> but the required Application (Client) Secret has not been configured (on the <a href=\"#singleSignOn\">Single Sign-on</a> tab). Please consult the online documentation using the link below.";
                 $test_result->more_info = 'https://docs.wpo365.com/article/130-azure-ad-b2c-based-single-sign-on-for-wordpress';
-                $this->delegated_access_token_test_result = $test_result;
                 return $test_result;
             }
 
@@ -105,7 +104,6 @@ if (!class_exists('\Wpo\Tests\Test_B2c')) {
                 $test_result->passed = false;
                 $test_result->message = 'Application (Client) Secret appears to be invalid. Possibly the secret\'s ID instead of its value has been copied from the corresonding page in Azure Portal.';
                 $test_result->more_info = 'https://docs.wpo365.com/article/130-azure-ad-b2c-based-single-sign-on-for-wordpress';
-                $this->application_access_token_test_result = $test_result;
                 return $test_result;
             }
 
@@ -172,7 +170,7 @@ if (!class_exists('\Wpo\Tests\Test_B2c')) {
                 $test_result->passed = false;
                 $test_result->message = 'ID token missing -> test skipped';
                 $test_result->more_info = '';
-            } elseif (empty($this->id_token->emails)) {
+            } elseif (empty($this->id_token->emails) && empty($this->id_token->email)) {
                 $test_result->passed = false;
                 $test_result->message = "ID token does not contain email address. Please update the user attributes and claims that you want to collect from the user during sign-up. See <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-user-flow\">this example</a> for guidance.";
                 $test_result->more_info = 'https://docs.wpo365.com/article/130-azure-ad-b2c-based-single-sign-on-for-wordpress';
@@ -263,8 +261,9 @@ if (!class_exists('\Wpo\Tests\Test_B2c')) {
             }
 
             $request_service = Request_Service::get_instance();
-            $this->request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
-            $this->request->set_item('wpo_usr', User_Service::user_from_b2c_id_token($this->id_token));
+            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
+            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
+            $request->set_item('wpo_usr', User_Service::user_from_b2c_id_token($this->id_token));
         }
     }
 }

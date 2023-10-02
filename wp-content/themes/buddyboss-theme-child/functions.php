@@ -86,6 +86,17 @@ function auto_enroll_new_user( $user_id ) {
 }
 add_action( 'user_register', 'auto_enroll_new_user');
 
+/* set email from username */
+function set_user_email( $user_id ) {
+  $user = get_userdata( $user_id );
+  $useremail = $user->user_login;
+  wp_update_user( array( 
+    'ID' => $user_id,
+    'user_email' => $useremail
+  ));
+}
+add_action( 'user_register', 'set_user_email');
+
 /* make notify of new replies auto-checked */
 function notify_of_new_replies_by_default( $checked, $topic_subscribed ) {
   if( $topic_subscribed == 0 )
@@ -97,15 +108,19 @@ add_filter( 'bbp_get_form_topic_subscribed', 'notify_of_new_replies_by_default',
 
 add_action( 'bp_dd_create_forums_topics', 'bbp_add_user_topic_subscription' );
 
-/* hide wp login fields */
+/* hide wp login fields 
 function login_go_sso() { ?>
   <style type="text/css">
-  .login-heading span { display: none; }
-  #user_label { display: none; }
-  #user_login { display: none; }
-  .user-pass-wrap { display: none; }
+      .login-heading span { display: none; }
+      #user_label { display: none; }
+      #user_login { display: none; }
+      .user-pass-wrap { display: none; }
+      .forgetmenot { display: none; }
+      .lostmenot { display: none; }
+      .submit { display: none; }
   </style>
 <?php }
-add_action( 'login_enqueue_scripts', 'login_go_sso' );
+add_action( 'login_enqueue_scripts', 'login_go_sso' ); */
+
 
 ?>

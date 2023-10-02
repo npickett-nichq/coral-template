@@ -1713,6 +1713,9 @@ body.bb-template-v2 #buddypress:not(.round-avatars) .groups-header #item-header-
   width: 42px;
   max-width: 42px;
 }
+.bb-template-v2 .widget.widget_follow_us .bb-follow-links {
+  row-gap: 4px;
+}
 .bb-template-v2 .widget.widget_follow_us .bb-follow-links a {
   margin-right: 4px;
   opacity: 1;
@@ -2959,6 +2962,7 @@ body.bb-template-v2:not(.buddypanel-open) .buddypanel.buddypanel--toggle-off .bu
 
 .bb-template-v2 .learndash-wrapper .ld-section-heading h2,
 .bb-template-v2 .bb-single-course-sidebar h4,
+.bb-template-v2 .bb-about-instructor .bb-instructor-heading,
 .bb-template-v2 .bb-about-instructor h4 {
   text-transform: none;
 }
@@ -2966,6 +2970,7 @@ body.bb-template-v2:not(.buddypanel-open) .buddypanel.buddypanel--toggle-off .bu
 .bb-template-v2 .learndash-wrapper .ld-item-list.ld-lesson-list .ld-section-heading h2 {
   font-size: 20px;
 }
+.bb-template-v2 .bb-about-instructor .bb-instructor-heading,
 .bb-template-v2 .bb-about-instructor h4 {
   font-size: 20px;
 }

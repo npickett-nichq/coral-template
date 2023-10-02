@@ -61,6 +61,10 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
                         add_action('wp_ajax_wpo365_get_mail_log', '\Wpo\Mail\Mail_Ajax_Service::get_mail_log');
                         add_action('wp_ajax_wpo365_send_mail_again', '\Wpo\Mail\Mail_Ajax_Service::send_mail_again');
                         add_action('wp_ajax_wpo365_truncate_mail_log', '\Wpo\Mail\Mail_Ajax_Service::truncate_mail_log');
+
+                        if (method_exists('\Wpo\Mail\Mail_Ajax_Service', 'mail_auto_retry')) {
+                            add_action('wp_ajax_wpo365_mail_auto_retry', '\Wpo\Mail\Mail_Ajax_Service::mail_auto_retry');
+                        }
                     }
                 }
 
@@ -86,10 +90,32 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
                         if (method_exists('\Wpo\Sync\SyncV2_Service', 'render_users_sync_columns')) {
                             add_filter('manage_users_custom_column', '\Wpo\Sync\SyncV2_Service::render_users_sync_columns', 10, 3);
                         }
+
+                        if (method_exists('\Wpo\Sync\SyncV2_Service', 'test_sync_query')) {
+                            add_action('wp_ajax_wpo365_test_sync_query', '\Wpo\Sync\SyncV2_Service::test_sync_query');
+                        }
+
+                        if (method_exists('\Wpo\Sync\SyncV2_Service', 'users_sync_bulk_actions')) {
+                            add_filter('bulk_actions-users', '\Wpo\Sync\SyncV2_Service::users_sync_bulk_actions', 10, 1);
+                            add_filter('handle_bulk_actions-users', '\Wpo\Sync\SyncV2_Service::users_sync_bulk_actions_handler', 10, 3);
+                        }
                     }
+                }
+
+                // WP to AAD 
+
+                if ((Options_Service::get_global_boolean_var('use_b2c', false) || Options_Service::get_global_boolean_var('use_ciam', false))  && class_exists('\Wpo\Services\Wp_To_Aad_Create_Update_Service')) {
+                    add_action('admin_init', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::send_to_azure', 10, 0);
+                    add_filter('manage_users_columns', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::register_users_sync_wp_to_aad_columns', 10);
+                    add_filter('manage_users_custom_column', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::render_users_sync_wp_to_aad_columns', 10, 3);
+                    add_filter('bulk_actions-users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::users_sync_wp_to_aad_bulk_actions', 10, 1);
+                    add_filter('handle_bulk_actions-users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::users_sync_wp_to_aad_bulk_actions_handler', 10, 3);
+                    add_filter('pre_get_users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::get_users', 10, 1);
+                    add_action('restrict_manage_users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::render_button_nok_users', 10, 1);
                 }
             } // End admin stuff
 
+            // Auth.-only
             if (class_exists('\Wpo\Services\Auth_Only_Service')) {
                 $scenario = Options_Service::get_global_string_var('auth_scenario', false);
 
@@ -103,7 +129,6 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
 
             // Add custom cron schedule for user sync
             if (class_exists('\Wpo\Core\Cron_Helpers')) {
-                // Filter to add custom cron schedules
                 add_filter('cron_schedules', '\Wpo\Core\Cron_Helpers::add_cron_schedules', 10, 1);
             }
 
@@ -117,6 +142,26 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
             if (class_exists('\Wpo\Sync\SyncV2_Service')) {
                 add_action('wpo_sync_v2_users_start', '\Wpo\Sync\SyncV2_Service::sync_users', 10, 1);
                 add_action('wpo_sync_v2_users_next', '\Wpo\Sync\SyncV2_Service::fetch_users', 10, 2);
+            }
+
+            if ((Options_Service::get_global_boolean_var('use_b2c', false) || Options_Service::get_global_boolean_var('use_ciam', false))) {
+
+                if (class_exists('\Wpo\Sync\Sync_Wp_To_Aad_Service')) {
+                    add_action('wpo_sync_wp_to_aad_start', '\Wpo\Sync\Sync_Wp_To_Aad_Service::sync_users', 10, 1);
+                    add_action('wpo_sync_wp_to_aad_next', '\Wpo\Sync\Sync_Wp_To_Aad_Service::fetch_users', 10, 2);
+                }
+
+                if (class_exists('\Wpo\Services\Wp_To_Aad_Create_Update_Service')) {
+                    add_action('user_register', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registered', PHP_INT_MAX, 1);
+                    add_filter('wp_pre_insert_user_data', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::handle_user_registering', PHP_INT_MAX, 4);
+                    add_action('wpo365/aad_user/created', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::send_new_customer_notification', 10, 2);
+                }
+
+                add_filter('register_url', '\Wpo\Services\Id_Token_Service_B2c::get_registration_url', 10, 1);
+            }
+
+            if (Options_Service::get_global_boolean_var('use_b2c', false) && class_exists('\Wpo\Services\B2c_Embedded_Service')) {
+                add_action('init', 'Wpo\Services\B2c_Embedded_Service::ensure_b2c_embedded_short_code');
             }
 
             // Ensure session is valid and remains valid
@@ -134,10 +179,6 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
             add_action('init', 'Wpo\Core\Shortcode_Helpers::ensure_login_button_short_code');
             add_action('init', 'Wpo\Core\Shortcode_Helpers::ensure_login_button_short_code_V2');
 
-            if (Options_Service::get_global_boolean_var('use_b2c', false) && class_exists('\Wpo\Services\B2c_Embedded_Service')) {
-                add_action('init', 'Wpo\Services\B2c_Embedded_Service::ensure_b2c_embedded_short_code');
-            }
-
             // Wire up AJAX backend services
             add_action('wp_ajax_get_tokencache', '\Wpo\Services\Ajax_Service::get_tokencache');
             add_action('wp_ajax_cors_proxy', '\Wpo\Services\Ajax_Service::cors_proxy');
@@ -149,7 +190,6 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
                 add_filter('manage_users_columns', '\Wpo\Services\Audiences_Service::register_users_audiences_column', 10);
                 add_filter('manage_users_custom_column', '\Wpo\Services\Audiences_Service::render_users_audiences_column', 10, 3);
                 add_filter('posts_where', '\Wpo\Services\Audiences_Service::posts_where', 10, 2);
-                add_filter('the_posts', '\Wpo\Services\Audiences_Service::the_posts', 10, 2);
                 add_filter('get_pages', '\Wpo\Services\Audiences_Service::get_pages', 10, 2);
                 add_filter('wp_count_posts', '\Wpo\Services\Audiences_Service::wp_count_posts', 10, 3);
                 add_filter('get_previous_post_where', '\Wpo\Services\Audiences_Service::get_previous_post_where', 10, 5);
@@ -169,6 +209,10 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
 
                 if (\method_exists('\Wpo\Services\Audiences_Service', 'audiences_save_post')) {
                     add_action('save_post', '\Wpo\Services\Audiences_Service::audiences_save_post', 10, 3);
+                }
+
+                if (\method_exists('\Wpo\Services\Audiences_Service', 'handle_404')) {
+                    add_filter('status_header', '\Wpo\Services\Audiences_Service::handle_404', 10, 4);
                 }
 
                 // WP-REST
@@ -273,13 +317,20 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
                 add_action('phpmailer_init', '\Wpo\Mail\Mailer::init', PHP_INT_MAX);
                 add_filter('wp_mail_from', '\Wpo\Mail\Mailer::mail_from', 10, 1);
 
-                if (Options_Service::get_global_boolean_var('mail_log', false) && class_exists('\Wpo\Mail\Mail_Db')) {
-                    // Log each wp_mail in the wpo365_table
+                if (Options_Service::get_global_boolean_var('mail_log', false) && method_exists('\Wpo\Mail\Mail_Db', 'add_mail_log')) {
                     add_filter('wp_mail', '\Wpo\Mail\Mail_Db::add_mail_log', 10, 1);
                 }
 
+                if (Options_Service::get_global_boolean_var('mail_throttling_enabled') && method_exists('\Wpo\Mail\Mail_Db', 'check_message_rate_limit')) {
+                    add_filter('wpo365/mail/before', '\Wpo\Mail\Mail_Db::check_message_rate_limit');
+                }
+
+                if (Options_Service::get_global_boolean_var('mail_auto_retry') && method_exists('\Wpo\Mail\Mail_Db', 'process_unsent_messages')) {
+                    add_action('wpo_process_unsent_messages', '\Wpo\Mail\Mail_Db::process_unsent_messages');
+                }
+
                 // Admin menu bar notifications
-                if (class_exists('\Wpo\Mail\Mail_Notifications') && Options_Service::get_global_boolean_var('mail_staging_mode', false)) {
+                if (Options_Service::get_global_boolean_var('mail_staging_mode', false) && class_exists('\Wpo\Mail\Mail_Notifications')) {
                     add_action('admin_bar_menu', '\Wpo\Mail\Mail_Notifications::staging_mode_active', 100);
                     add_action('wp_enqueue_scripts', '\Wpo\Core\Script_Helpers::add_admin_bar_styles');
                     add_action('admin_enqueue_scripts', '\Wpo\Core\Script_Helpers::add_admin_bar_styles');
@@ -327,6 +378,15 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
             if (Options_Service::get_global_boolean_var('new_usr_send_mail_custom', false) && class_exists('\Wpo\Services\Mail_Notifications_Service')) {
                 // Filter to change the new user email notification
                 add_filter('wp_new_user_notification_email', '\Wpo\Services\Mail_Notifications_Service::new_user_notification_email', 99, 3);
+            }
+
+            if (!Options_Service::get_global_boolean_var('new_usr_send_mail', false)) {
+                add_filter('wp_send_new_user_notification_to_user', '__return_false');
+                add_filter('wp_send_new_user_notification_to_admin', '__return_false');
+            }
+
+            if (Options_Service::get_global_boolean_var('new_usr_send_mail_admin_only', false)) {
+                add_filter('wp_send_new_user_notification_to_user', '__return_false');
             }
 
             // Must be added before the next wp_logout hook

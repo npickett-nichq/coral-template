@@ -263,7 +263,7 @@ function bb_theme_version_updater() {
 	}
 
 	if ( $raw_db_version !== $current_db ) {
-		// @todo - Write only data manipulate migration here. ( This is not for DB structure change ).
+		bb_theme_migrate_google_plus();
 	}
 }
 
@@ -658,4 +658,25 @@ function bb_theme_update_2_3_60() {
 	}
 
 	update_option( 'buddyboss_theme_options', $bb_theme_options );
+}
+
+/**
+ * Remove support of google plus.
+ *
+ * @since 2.4.20
+ *
+ * @return void
+ */
+function bb_theme_migrate_google_plus() {
+	$footer_socials = buddyboss_theme_get_option( 'boss_footer_social_links' );
+	if ( ! empty( $footer_socials ) && isset( $footer_socials['google-plus'] ) ) {
+		$buddyboss_theme_options = get_option( 'buddyboss_theme_options', array() );
+		$google_plus             = $footer_socials['google-plus'];
+		if ( ! empty( $google_plus ) ) {
+			update_option( 'bb_theme_google_plus', $google_plus );
+		}
+		unset( $footer_socials['google-plus'] );
+		$buddyboss_theme_options['boss_footer_social_links'] = $footer_socials;
+		update_option( 'buddyboss_theme_options', $buddyboss_theme_options );
+	}
 }

@@ -270,7 +270,10 @@ $recording_groups_dates_print = array_unique( $recording_groups_dates_print );
 							<?php endif; ?>
 						</div>
 
-						<?php if ( 'MP4' === $recording_file->file_type || 'M4A' === $recording_file->file_type ) : ?>
+						<?php
+						if ( 'MP4' === $recording_file->file_type || 'M4A' === $recording_file->file_type ) :
+							$recording_access_token = bb_zoom_recording_get_access_token( $meeting_id );
+							?>
 							<div class="bb-media-model-wrapper bb-internal-model" style="display: none;">
 
 								<a data-balloon-pos="left" data-balloon="<?php esc_attr_e( 'Close', 'buddyboss-pro' ); ?>" class="bb-close-media-theatre bb-close-model" href="#">
@@ -284,14 +287,14 @@ $recording_groups_dates_print = array_unique( $recording_groups_dates_print );
 										<div class="bb-media-section">
 											<?php if ( 'MP4' === $recording_file->file_type ) : ?>
 												<video controls>
-													<source src="<?php echo esc_url( $recording_file->download_url . '?access_token=' . bp_zoom_conference()->generate_jwt_key() ); ?>"
+													<source src="<?php echo esc_url( $recording_file->download_url . '?access_token=' . $recording_access_token ); ?>"
 															type="video/mp4">
 													<p><?php esc_html_e( 'Your browser does not support HTML5 video.', 'buddyboss-pro' ); ?></p>
 												</video>
 											<?php endif; ?>
 											<?php if ( 'M4A' === $recording_file->file_type ) : ?>
 												<audio controls>
-													<source src="<?php echo esc_url( $recording_file->download_url . '?access_token=' . bp_zoom_conference()->generate_jwt_key() ); ?>"
+													<source src="<?php echo esc_url( $recording_file->download_url . '?access_token=' . $recording_access_token ); ?>"
 															type="audio/mp4">
 													<p><?php esc_html_e( 'Your browser does not support HTML5 audio.', 'buddyboss-pro' ); ?></p>
 												</audio>

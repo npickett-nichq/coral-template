@@ -52,35 +52,9 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
         {
             Log_Service::write_log('DEBUG', '##### -> ' . __METHOD__);
 
-            $request_service = Request_Service::get_instance();
-            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
-
-            // Anonymous function to update the mail log
-
-            $update_mail_log = function ($log_message = null, $success = false) {
-
-                if (class_exists('\Wpo\Mail\Mail_Db')) {
-
-                    \Wpo\Mail\Mail_Db::update_mail_log(
-                        $success,
-                        $log_message
-                    );
-                }
-            };
-
             if (Options_Service::get_global_boolean_var('mail_staging_mode')) {
                 $log_message = 'An email was not sent because the administrator activated the Mail Staging Mode. Please use the <a href="#mailLogViewer">Mail Log Viewer</a> to view staged emails.';
-                $request->set_item('mail_error', $log_message);
-                Log_Service::write_log(
-                    'WARN',
-                    sprintf(
-                        '%s -> %s',
-                        __METHOD__,
-                        $log_message
-                    ),
-                    array('wpoMail' => 'warning')
-                );
-                $update_mail_log($log_message, true);
+                self::update_mail_log($log_message, true, 'WARN', true);
                 return true;
             }
 
@@ -93,15 +67,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                     print_r($this->phpmailer_data->getToAddresses(), true)
                 );
 
-                if (class_exists('\Wpo\Mail\Mail_Db')) {
-                    \Wpo\Mail\Mail_Db::update_mail_log(
-                        false,
-                        $mail_error
-                    );
-                }
-
-                $request->set_item('mail_error', $mail_error);
-
+                self::update_mail_log($mail_error, false, 'ERROR', true);
                 return false;
             }
 
@@ -161,14 +127,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                         $e->getMessage()
                     );
 
-                    if (class_exists('\Wpo\Mail\Mail_Db')) {
-                        \Wpo\Mail\Mail_Db::update_mail_log(
-                            false,
-                            $log_message
-                        );
-                    }
-
-                    Log_Service::write_log('ERROR', $log_message, array('wpoMail' => 'error'));
+                    self::update_mail_log($log_message, false, 'ERROR', false);
                     continue;
                 }
 
@@ -191,14 +150,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                         $file_exists ? 'Yes' : 'No'
                     );
 
-                    if (class_exists('\Wpo\Mail\Mail_Db')) {
-                        \Wpo\Mail\Mail_Db::update_mail_log(
-                            false,
-                            $log_message
-                        );
-                    }
-
-                    Log_Service::write_log('ERROR', $log_message, array('wpoMail' => 'error'));
+                    self::update_mail_log($log_message, false, 'ERROR', false);
                 }
             }
 
@@ -220,14 +172,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                     $cc = array();
                 } else {
                     $log_message = sprintf('%s -> The administrator has configured the option to send mail as BCC but did not specify a valid default recipient [%s]', __METHOD__, $default_recipient);
-                    Log_Service::write_log('ERROR', $log_message, array('wpoMail' => 'error'));
-
-                    if (class_exists('\Wpo\Mail\Mail_Db')) {
-                        \Wpo\Mail\Mail_Db::update_mail_log(
-                            false,
-                            $log_message
-                        );
-                    }
+                    self::update_mail_log($log_message, false, 'ERROR', false);
                 }
             }
 
@@ -350,6 +295,14 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
             if (is_wp_error($access_token)) {
                 $message_sent_result = $access_token;
             } else {
+                $continue = apply_filters('wpo365/mail/before', null);
+
+                if (is_wp_error($continue)) {
+                    $log_level = Options_Service::get_global_boolean_var('mail_auto_retry') ? 'WARN' : 'ERROR';
+                    self::update_mail_log($continue->get_error_message(), false, $log_level, false);
+                    return false;
+                }
+
                 $message_sent_result = self::mg_fetch($query, $message_as_json, $access_token['access_token']);
             }
 
@@ -364,9 +317,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
 
             if (is_wp_error($message_sent_result)) {
                 $log_message = $error_message . ' [Error: ' . $message_sent_result->get_error_message() . ']';
-                $request->set_item('mail_error', $log_message);
-                Log_Service::write_log('ERROR', __METHOD__ . ' -> ' . $log_message, array('wpoMail' => 'error'));
-                $update_mail_log($log_message);
+                self::update_mail_log($log_message, false, 'ERROR', true);
                 return false;
             }
 
@@ -377,7 +328,7 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                 // Retry after 403 when using application-type permissions
 
                 if (isset($access_token['type']) && $access_token['type'] == 'application' && $message_sent_result['response_code'] === 403 && $retry_error_code === 0) {
-                    Log_Service::write_log('DEBUG', sprintf(
+                    Log_Service::write_log('WARN', sprintf(
                         '%s -> %s [Error: The user account which was used to submit this request \'%s\' does not have the right to send mail on behalf of the specified sending account \'%s\'].',
                         __METHOD__,
                         $error_message,
@@ -389,16 +340,13 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
 
                 if (is_array($message_sent_result) && isset($message_sent_result['payload']) && isset($message_sent_result['payload']['error']) && isset($message_sent_result['payload']['error']['message'])) {
                     $log_message = $error_message . ' [Error: ' . $message_sent_result['payload']['error']['message'] . ']';
-                    $request->set_item('mail_error', $log_message);
-                    Log_Service::write_log('ERROR', __METHOD__ . ' -> ' . $log_message, array('wpoMail' => 'error'));
-                    $update_mail_log($log_message);
+                    self::update_mail_log($log_message, false, 'ERROR', true);
                     return false;
                 }
 
                 $log_message = sprintf('%s [See debug log for details]', $error_message);
-                Log_Service::write_log('ERROR', sprintf('%s -> %s', __METHOD__, $log_message), array('wpoMail' => 'error'));
+                self::update_mail_log($log_message, false, 'ERROR', true);
                 Log_Service::write_log('WARN', $message_sent_result);
-                $update_mail_log($log_message);
                 return false;
             }
 
@@ -414,20 +362,13 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
                         'Creating a draft email to be sent with attachments larger than 3 Mb failed [message ID not found in response]. Please manually delete the draft message from the "Drafts" folder for the account %s',
                         $sender
                     );
-
-                    Log_Service::write_log('ERROR', sprintf('%s -> %s', __METHOD__, $log_message), array('wpoMail' => 'error'));
-                    $update_mail_log($log_message);
-                    $request->set_item('mail_error', $log_message);
+                    self::update_mail_log($log_message, false, 'ERROR', true);
                     return false;
                 }
             }
 
-            Log_Service::write_log('DEBUG', sprintf(
-                '%s -> WordPress email sent successfully using Microsoft Graph',
-                __METHOD__
-            ));
-
-            $update_mail_log(null, true);
+            $log_message = 'WordPress email sent successfully using Microsoft Graph';
+            self::update_mail_log($log_message, true, 'DEBUG', true);
 
             return true;
         }
@@ -495,29 +436,6 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
             add_filter('wp_mail_from', '\Wpo\Mail\Mailer::mail_from', 10, 1);
 
             return wp_mail($_to, $subject, $content, $headers, $attachments);
-        }
-
-        /**
-         * A logger that writes immediately to the default log handling routine.
-         * 
-         * @since   17.0
-         * 
-         * @param   string  $level      DEBUG, WARN or ERROR
-         * @param   mixed   $message    If not a string the object / array will be printed using print_r
-         * @return  void
-         */
-        public static function mailer_log($level, $message)
-        {
-            error_log(
-                \sprintf(
-                    '[%s | %s] %s ( %s ): %s',
-                    (\DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', '')))->format('m-d-Y H:i:s.u'),
-                    empty($GLOBALS['WPO_CONFIG']['request_id']) ? '' : $GLOBALS['WPO_CONFIG']['request_id'],
-                    empty($level) ? 'DEBUG' : $level,
-                    \phpversion(),
-                    \is_string($message) ? $message : print_r($message, true)
-                )
-            );
         }
 
         /**
@@ -635,6 +553,43 @@ if (!class_exists('\Wpo\Mail\Mailer')) {
             $body = json_decode($body, true);
             $http_code = wp_remote_retrieve_response_code($response);
             return array('payload' => $body, 'response_code' => $http_code);
+        }
+
+        /**
+         * Logs debug / warning / error info to the WPO365 log stream and optionally to the WPO365 mail log DB.
+         * 
+         * @since 24.0
+         * 
+         * @param mixed $log_message 
+         * @param bool $success 
+         * @param mixed $log_level 
+         * @return void 
+         */
+        public static function update_mail_log($log_message, $success, $log_level, $count_attempt)
+        {
+            $request_service = Request_Service::get_instance();
+            $request = $request_service->get_request($GLOBALS['WPO_CONFIG']['request_id']);
+
+            if (class_exists('\Wpo\Mail\Mail_Db')) {
+                \Wpo\Mail\Mail_Db::update_mail_log(
+                    $success,
+                    $log_message,
+                    $count_attempt
+                );
+            }
+
+            if (!empty($log_level)) {
+                $log_props_level = $log_level == 'WARN' ? 'warning' : 'error';
+                $log_props = array('wpoMail' => $log_props_level);
+                $request->set_item('mail_error', $log_message);
+                Log_Service::write_log($log_level, sprintf('%s -> %s', __METHOD__, $log_message, $log_props));
+            }
+
+            // if the attempt counts then now it is time to clean up
+            if ($count_attempt) {
+                $request->remove_item('mail_log_id');
+                do_action('wpo365/mail/sent');
+            }
         }
 
         /**

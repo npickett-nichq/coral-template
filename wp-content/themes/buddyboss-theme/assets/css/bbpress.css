@@ -4260,27 +4260,21 @@ article.type-page .entry-content > #bbpress-forums .bbp-forum-form .bbp-submit-w
   margin-left: 0;
 }
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal #whats-new-toolbar,
-.elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_tags_wrapper,
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp-the-content-wrapper,
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_title_wrapper,
 .elementor-shortcode #bbpress-forums .bbp-forum-form.bb-modal #whats-new-toolbar,
-.elementor-shortcode #bbpress-forums .bbp-forum-form.bb-modal .bbp_topic_tags_wrapper,
 .elementor-shortcode #bbpress-forums .bbp-forum-form.bb-modal .bbp-the-content-wrapper,
 .elementor-shortcode #bbpress-forums .bbp-forum-form.bb-modal .bbp_topic_title_wrapper,
 article.type-page .entry-content > .bbp-topic-form.bb-modal #whats-new-toolbar,
-article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_tags_wrapper,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp-the-content-wrapper,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_title_wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal #whats-new-toolbar,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_tags_wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal .bbp-the-content-wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_title_wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal #whats-new-toolbar,
-article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal .bbp_topic_tags_wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal .bbp-the-content-wrapper,
 article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal .bbp_topic_title_wrapper,
 .entry-content > .bbp-forum-form.bb-modal #whats-new-toolbar,
-.entry-content > .bbp-forum-form.bb-modal .bbp_topic_tags_wrapper,
 .entry-content > .bbp-forum-form.bb-modal .bbp-the-content-wrapper,
 .entry-content > .bbp-forum-form.bb-modal .bbp_topic_title_wrapper {
   border: 0;
@@ -4318,6 +4312,14 @@ article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal .bb-
 article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal .bb-form-select-fields,
 .entry-content > .bbp-forum-form.bb-modal .bb-form-select-fields {
   padding: 15px 25px;
+}
+.elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp-submit-wrapper .button.submit,
+.elementor-shortcode #bbpress-forums .bbp-forum-form.bb-modal .bbp-submit-wrapper .button.submit,
+article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp-submit-wrapper .button.submit,
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form.bb-modal .bbp-submit-wrapper .button.submit,
+article.type-page .entry-content > #bbpress-forums .bbp-forum-form.bb-modal .bbp-submit-wrapper .button.submit,
+.entry-content > .bbp-forum-form.bb-modal .bbp-submit-wrapper .button.submit {
+  margin-left: 15px;
 }
 
 .elementor-shortcode .bbp-reply-form .bbp-form > legend,
@@ -4397,24 +4399,6 @@ article.type-page .entry-content > #bbpress-forums .bbp-topic-form div.dropzone.
 .entry-content > .bbp-reply-form div.dropzone.dz-started {
   margin-bottom: 0;
 }
-.elementor-shortcode .bbp-reply-form .bbp_topic_tags_wrapper,
-.elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_tags_wrapper,
-article.type-page .entry-content > .bbp-topic-form .bbp_topic_tags_wrapper,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_tags_wrapper,
-.entry-content > .bbp-reply-form .bbp_topic_tags_wrapper {
-  background-color: var(--bb-content-background-color);
-  border: 1px solid var(--bb-content-border-color);
-  border-top: 0;
-  border-radius: 0 0 var(--bb-input-radius) var(--bb-input-radius);
-}
-.elementor-shortcode .bbp-reply-form .bb-form-select-fields,
-.elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields,
-article.type-page .entry-content > .bbp-topic-form .bb-form-select-fields,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields,
-.entry-content > .bbp-reply-form .bb-form-select-fields {
-  margin: 15px 0 0;
-  padding: 0;
-}
 .elementor-shortcode .bbp-reply-form .medium-editor-element,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .medium-editor-element,
 article.type-page .entry-content > .bbp-topic-form .medium-editor-element,
@@ -4457,35 +4441,52 @@ article.type-page .entry-content > #bbpress-forums .bbp-topic-form #bbp-template
   margin: 10px 15px;
 }
 
+.elementor-shortcode .bbp-reply-form:not(.bb-modal-box) .bbp_topic_tags_wrapper,
+.elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_tags_wrapper,
+article.type-page .entry-content > .bbp-topic-form:not(.bb-modal-box) .bbp_topic_tags_wrapper,
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_tags_wrapper,
+.entry-content > .bbp-reply-form:not(.bb-modal-box) .bbp_topic_tags_wrapper {
+  background-color: var(--bb-content-background-color);
+  border: 1px solid var(--bb-content-border-color);
+  border-radius: 0 0 var(--bb-input-radius) var(--bb-input-radius);
+}
+.elementor-shortcode .bbp-reply-form:is(.bbp-topic-form) .bbp_topic_tags_wrapper,
+.elementor-shortcode #bbpress-forums .bbp-topic-form:is(.bbp-topic-form) .bbp_topic_tags_wrapper,
+article.type-page .entry-content > .bbp-topic-form:is(.bbp-topic-form) .bbp_topic_tags_wrapper,
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:is(.bbp-topic-form) .bbp_topic_tags_wrapper,
+.entry-content > .bbp-reply-form:is(.bbp-topic-form) .bbp_topic_tags_wrapper {
+  border-top: 0;
+}
+
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_title_wrapper .new_topic_title_avatar,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper .new_topic_title_avatar,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_title_wrapper .new_topic_title_avatar,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper .new_topic_title_avatar {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_title_wrapper .new_topic_title_avatar {
   width: 64px;
   min-width: 64px;
 }
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_title_wrapper .new_topic_title_avatar img,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper .new_topic_title_avatar img,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_title_wrapper .new_topic_title_avatar img,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper .new_topic_title_avatar img {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_title_wrapper .new_topic_title_avatar img {
   width: 100%;
 }
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_title_wrapper #bbp_topic_title,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper #bbp_topic_title,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_title_wrapper #bbp_topic_title,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_title_wrapper #bbp_topic_title {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_title_wrapper #bbp_topic_title {
   margin: 10px 0 0 15px;
 }
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal #bbp_topic_submit,
 .elementor-shortcode #bbpress-forums .bbp-topic-form #bbp_topic_submit,
 article.type-page .entry-content > .bbp-topic-form.bb-modal #bbp_topic_submit,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form #bbp_topic_submit {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) #bbp_topic_submit {
   margin-top: 15px;
 }
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_subscription_wrapper,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_subscription_wrapper,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_subscription_wrapper,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_subscription_wrapper {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_subscription_wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -4496,7 +4497,7 @@ article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_su
 .elementor-shortcode #bbpress-forums .bbp-topic-form.bb-modal .bbp_topic_subscription_wrapper > label,
 .elementor-shortcode #bbpress-forums .bbp-topic-form .bbp_topic_subscription_wrapper > label,
 article.type-page .entry-content > .bbp-topic-form.bb-modal .bbp_topic_subscription_wrapper > label,
-article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bbp_topic_subscription_wrapper > label {
+article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bbp_topic_subscription_wrapper > label {
   margin-bottom: -15px;
 }
 
@@ -4541,17 +4542,17 @@ body:not(.logged-in) .entry-content > .bbp-reply-form .bbp-form fieldset.bbp-for
 }
 
 @media screen and (max-width: 992px) {
-  .elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields,
-  article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields {
+  .elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields,
+  article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields {
     display: block;
   }
-  .elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields > div,
-  article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields > div {
+  .elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div,
+  article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div {
     width: 50%;
     float: left;
   }
-  .elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields .bbp-submit-wrapper,
-  article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields .bbp-submit-wrapper {
+  .elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields .bbp-submit-wrapper,
+  article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields .bbp-submit-wrapper {
     clear: none;
   }
 }
@@ -4566,13 +4567,13 @@ body:not(.logged-in) .entry-content > .bbp-reply-form .bbp-form fieldset.bbp-for
     margin-left: 0;
   }
 
-  .elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields > div,
-  article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields > div {
+  .elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div,
+  article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div {
     width: 100%;
     margin-bottom: 10px;
   }
-  .elementor-shortcode #bbpress-forums .bbp-topic-form .bb-form-select-fields > div #bbp_topic_submit,
-  article.type-page .entry-content > #bbpress-forums .bbp-topic-form .bb-form-select-fields > div #bbp_topic_submit {
+  .elementor-shortcode #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div #bbp_topic_submit,
+  article.type-page .entry-content > #bbpress-forums .bbp-topic-form:not(.bb-modal-box) .bb-form-select-fields > div #bbp_topic_submit {
     margin-left: 0;
   }
 }
@@ -5394,6 +5395,10 @@ body .bbp_topic_tags_wrapper .bb-select-container.select2-selection.select2-sele
   -webkit-box-flex: 1;
       -ms-flex: auto;
           flex: auto;
+}
+.elementor-location-popup #bbpress-forums .bbp-topic-form .bbp_topic_subscription_wrapper > label,
+#bbpress-forums .bb-modal.bbp-topic-form .bbp_topic_subscription_wrapper > label {
+  display: block;
 }
 .elementor-location-popup #bbpress-forums .bbp-topic-form .bbp_topic_form_forum_wrapper,
 #bbpress-forums .bb-modal.bbp-topic-form .bbp_topic_form_forum_wrapper {

@@ -15,12 +15,14 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
 
         private $use_saml = false;
         private $use_b2c = false;
+        private $use_ciam = false;
         private $no_sso = false;
 
         public function __construct()
         {
             $this->use_saml = Options_Service::get_global_boolean_var('use_saml');
             $this->use_b2c = Options_Service::get_global_boolean_var('use_b2c');
+            $this->use_ciam = Options_Service::get_global_boolean_var('use_ciam');
             $this->no_sso = Options_Service::get_global_boolean_var('no_sso');
         }
 
@@ -55,7 +57,13 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
             $test_result = new Test_Result('"Internet" mode optimization', Test_Result::CAPABILITY_CONFIG, Test_Result::SEVERITY_CRITICAL);
             $test_result->passed = true;
 
+            /**
+             * @since 24.0 Filters the AAD Redirect URI e.g. to set it dynamically to the current host.
+             */
+
             $redirect_url = Options_Service::get_aad_option('redirect_url');
+            $redirect_url = apply_filters('wpo365/aad/redirect_uri', $redirect_url);
+
 
             if ($is_optimized && (empty($redirect_url) || false === WordPress_Helpers::stripos($redirect_url, '/wp-admin'))) {
                 $test_result->passed = false;
@@ -87,7 +95,7 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
             $test_result = new Test_Result('Correct use of HTTPS', Test_Result::CAPABILITY_CONFIG, Test_Result::SEVERITY_CRITICAL);
             $test_result->passed = true;
 
-            $aad_redirect_url = Options_Service::get_aad_option('redirect_url');
+            $aad_redirect_url = Options_Service::get_aad_option('redirect_url'); // At the moment we don't apply the wpo365/aad/redirect_uri filter
             $wp_home = $GLOBALS['WPO_CONFIG']['url_info']['wp_site_url'];
 
             if (WordPress_Helpers::stripos($aad_redirect_url, 'http://') === 0  && WordPress_Helpers::stripos($aad_redirect_url, 'localhost') === false) {
@@ -102,7 +110,7 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
         public function test_domain_hint()
         {
 
-            if ($this->use_saml || $this->use_b2c || $this->no_sso) {
+            if ($this->use_saml || $this->use_b2c || $this->use_ciam || $this->no_sso) {
                 return;
             }
 
@@ -134,7 +142,7 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
         public function test_custom_domain()
         {
 
-            if ($this->use_b2c || $this->no_sso) {
+            if ($this->use_b2c || $this->use_ciam || $this->no_sso) {
                 return;
             }
 
@@ -155,11 +163,6 @@ if (!class_exists('\Wpo\Tests\Test_Configuration')) {
 
         public function test_wpo365_rest_api()
         {
-
-            if ($this->use_b2c) {
-                return;
-            }
-
             $test_result = new Test_Result('Custom REST API endpoint has been added', Test_Result::CAPABILITY_CONFIG, Test_Result::SEVERITY_CRITICAL);
             $test_result->passed = true;
 
