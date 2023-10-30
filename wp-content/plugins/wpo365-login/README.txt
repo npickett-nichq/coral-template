@@ -3,7 +3,7 @@ Contributors: wpo365
 Tags: office 365, O365, Microsoft 365, azure active directory, Azure AD, AAD, authentication, single sign-on, sso, SAML, SAML 2.0, OpenID Connect, OIDC, login, oauth, microsoft, microsoft graph, teams, microsoft teams, sharepoint online, sharepoint, spo, onedrive, SCIM, User synchronization, yammer, powerbi, power bi, mail, smtp, phpmailer, wp_mail, email
 Requires at least: 4.8.1
 Tested up to: 6.3
-Stable tag: 24.0
+Stable tag: 24.3
 Requires PHP: 5.6.40
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -217,6 +217,20 @@ Please refer to [these **Getting started** articles](https://docs.wpo365.com/cat
 
 == Changelog ==
 
+= v24.3 =
+* Feature: WPO365 can now send a daily notification to the administation email address if one of the application / client secrets is about to expire in the next 30 days. Consult [this article](https://www.wpo365.com/article/client-secret-expiration-notification/) for details. [LOGIN, MICROSOFT GRAPH MAILER]
+* Fix: The field to enter the Azure AD B2C / Entra External ID default policy is now unlocked for the free WPO365 | LOGIN version. [LOGIN]
+
+= v24.2 =
+* Fix: WPO365's SCIM server to support Azure AD User provisioning has been tested against (Microsoft's Entra ID SCIM Validator)[https://scimvalidator.microsoft.com/] and the resulting issues have been (mostly) resolved. [SCIM, INTRANET]
+* Fix: The field to enter the Azure AD B2C / Entra External ID domain name is now unlocked for the free WPO365 | LOGIN version. [LOGIN]
+* Fix: The fields "officeLocation" has been made available for use in a (customized) Employee Directory templates. [M365 APPS, INTRANET]
+
+= v24.1 =
+* Fix: User sync query tester now handles single quotes correctly, after the deprecated use of JavaScript's (un)escape method had been replaced previously. [SYNC, INTRANET, CUSTOMERS]
+* Fix: The plugin's updater will now display a notification when a newer version is available. [ALL]
+* Fix: Link to the updated documentation for the Mail Staging Mode in the release notes for v24 has now been fixed. [LOGIN]
+
 = v24.0 =
 * Breaking change: Testing the User synchronization query no longer requires the WPO365 REST API for Microsoft Graph to be enabled. Administrators, however, must update both WPO365 | LOGIN and the premium extension / bundle or else they cannot test the query. If the user sync query remains unchanged, it is no longer needed to test the query again. [SYNC, INTRANET, CUSTOMERS]
 * Deprecated: Administrators can not add new *Private pages* to the corresponding list on the plugin's *Authentication* configuration page anymore. Instead they must enable and configure the **Audiences** feature, which provide a more robust option to mark pages or post types as private i.e. to require a user to log in first. See the [online documentation](https://docs.wpo365.com/article/139-audiences) for details. [LOGIN+, ROLES + ACCESS, SYNC, INTRANET]
@@ -234,7 +248,7 @@ Please refer to [these **Getting started** articles](https://docs.wpo365.com/cat
 * Improvement: Administrators can now select a (custom) claim from the ID token or the SAML response that WPO365 should be using to create a new WordPress user's username. See the [updated documentation](https://docs.wpo365.com/article/187-username-preference) for details. [LOGIN+, SYNC, INTRANET]
 * Improvement: Developers can now skip the removal of specific roles when WPO365 is configured to "Replace" user roles by utilizing the new "wpo365/roles/remove" filter. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [ROLES + ACCESS, SYNC, INTRANET]
 * Improvement: Developers can now add a filter for the Azure AD Redirect URI e.g. to set it dynamically to the current host. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [LOGIN]
-* Improvement: The WPO365 | MAIL premium addon now also unlocks the option to use WP-Config.php to override (some) config options. Now administrators can - for example on their staging environment - enable mail-staging mode, simply by adding a global constant to the WP-Config.php file. See the [updated documentation](). [MAIL]
+* Improvement: The WPO365 | MAIL premium addon now also unlocks the option to use WP-Config.php to override (some) config options. Now administrators can - for example on their staging environment - enable mail-staging mode, simply by adding a global constant to the WP-Config.php file. See the [updated documentation](https://docs.wpo365.com/article/171-mail-staging-mode). [MAIL]
 * Improvement: Developers can now skip the URL check that WPO365 conducts just before it redirects a user to its final destination by hooking into a new filter wpo365/url_check/skip. See the [updated documentation](https://docs.wpo365.com/article/82-developer-hooks) for details. [LOGIN]
 * Improvement: Administrators can now configure WPO365 user synchronization to only send mail notifications when a job did not complete successfully. [SYNC, INTRANET]
 * Improvement: Administrators now can bulk-reactivate users that have been deactivated previously by WPO365. [SYNC, INTRANET, CUSTOMERS]

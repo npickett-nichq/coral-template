@@ -180,7 +180,7 @@ if (!class_exists('\Wpo\Core\Shortcode_Helpers')) {
         public static function ensure_display_error_message_short_code()
         {
 
-            if ((class_exists('\Wpo\Professional') || class_exists('\Wpo\Premium') || class_exists('\Wpo\Intranet')) && !shortcode_exists('wpo365-display-error-message-sc'))
+            if ((class_exists('\Wpo\Professional') || class_exists('\Wpo\Customers') || class_exists('\Wpo\Premium') || class_exists('\Wpo\Intranet')) && !shortcode_exists('wpo365-display-error-message-sc'))
                 add_shortcode('wpo365-display-error-message-sc', '\Wpo\Core\Shortcode_Helpers::add_display_error_message_shortcode');
         }
 
@@ -206,7 +206,7 @@ if (!class_exists('\Wpo\Core\Shortcode_Helpers')) {
             }
 
             ob_start();
-            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-professional/wpo365-login.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-sync-5y/wpo365-sync-5y.php', 'wpo365-login-intranet/wpo365-login.php', 'wpo365-intranet-5y/wpo365-intranet-5y.php', 'wpo365-customers/wpo365-customers.php')) . '/templates/error-message.php');
+            include(Extensions_Helpers::get_active_extension_dir(array('wpo365-login-professional/wpo365-login.php', 'wpo365-customers/wpo365-customers.php', 'wpo365-login-premium/wpo365-login.php', 'wpo365-sync-5y/wpo365-sync-5y.php', 'wpo365-login-intranet/wpo365-login.php', 'wpo365-intranet-5y/wpo365-intranet-5y.php', 'wpo365-customers/wpo365-customers.php')) . '/templates/error-message.php');
             $content = ob_get_clean();
             return wp_kses($content, WordPress_Helpers::get_allowed_html());
         }

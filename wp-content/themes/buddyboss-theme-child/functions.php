@@ -122,5 +122,15 @@ function login_go_sso() { ?>
 <?php }
 add_action( 'login_enqueue_scripts', 'login_go_sso' ); */
 
+/* workaround code to get TEC views to work right */
+$bypass_forced_default = function ( $private_check ) use ( &$bypass_forced_default ) {
+  remove_filter( 'bp_private_network_pre_check', $bypass_forced_default );
+  return true;
+};
+$add_check = function ( $query ) use ( $bypass_forced_default ) {
+  add_filter( 'bp_private_network_pre_check', $bypass_forced_default );
+  return $query;
+};
+add_filter( 'tribe_rewrite_parse_query_vars', $add_check, 1 );
 
 ?>

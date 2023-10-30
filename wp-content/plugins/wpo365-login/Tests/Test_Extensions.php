@@ -28,12 +28,27 @@ if (!class_exists('\Wpo\Tests\Test_Extensions')) {
 
         public function test_wpo365_premium()
         {
-            return $this->get_test_result_for_extensions('wpo365-login-premium/wpo365-login.php', 'WPO365 | SYNC', 24.0);
+            return $this->get_test_result_for_extensions('wpo365-login-premium/wpo365-login.php', 'WPO365 | SYNC', 24.1);
+        }
+
+        public function test_wpo365_sync_5y()
+        {
+            return $this->get_test_result_for_extensions('wpo365-sync-5y/wpo365-sync-5y.php', 'WPO365 | SYNC | 5Y', 24.1);
+        }
+
+        public function test_wpo365_intranet_5y()
+        {
+            return $this->get_test_result_for_extensions('wpo365-intranet-5y/wpo365-intranet-5y.php', 'WPO365 | SYNC', 24.2);
+        }
+
+        public function test_wpo365_customers()
+        {
+            return $this->get_test_result_for_extensions('wpo365-customers/wpo365-customers.php', 'WPO365 | CUSTOMERS', 24.1);
         }
 
         public function test_wpo365_intranet()
         {
-            return $this->get_test_result_for_extensions('wpo365-login-intranet/wpo365-login.php', 'WPO365 | INTRANET', 24.0);
+            return $this->get_test_result_for_extensions('wpo365-login-intranet/wpo365-login.php', 'WPO365 | INTRANET', 24.2);
         }
 
         public function test_wpo365_profile_plus()
@@ -68,7 +83,7 @@ if (!class_exists('\Wpo\Tests\Test_Extensions')) {
 
         public function test_wpo365_apps()
         {
-            return $this->get_test_result_for_extensions('wpo365-apps/wpo365-apps.php', 'WPO365 | APPS', 24.0);
+            return $this->get_test_result_for_extensions('wpo365-apps/wpo365-apps.php', 'WPO365 | APPS', 24.1);
         }
 
         public function test_wpo365_documents()
@@ -79,6 +94,11 @@ if (!class_exists('\Wpo\Tests\Test_Extensions')) {
         public function test_wpo365_roles_access()
         {
             return $this->get_test_result_for_extensions('wpo365-roles-access/wpo365-roles-access.php', 'WPO365 | ROLES + ACCESS', 24.0);
+        }
+
+        public function test_wpo365_scim()
+        {
+            return $this->get_test_result_for_extensions('wpo365-scim/wpo365-scim.php', 'WPO365 | SCIM', 24.1);
         }
 
         private function get_test_result_for_extensions($slug, $title, $version)

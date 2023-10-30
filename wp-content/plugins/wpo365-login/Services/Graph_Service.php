@@ -68,7 +68,8 @@ if (!class_exists('\Wpo\Services\Graph_Service')) {
                 }
             }
 
-            $use_app_only = Options_Service::get_global_boolean_var('use_app_only_token');
+            $use_mail_config = !class_exists('\Wpo\Login') && class_exists('\Wpo\MsGraphMailer');
+            $use_app_only = Options_Service::get_global_boolean_var('use_app_only_token') || ($use_mail_config);
             $no_sso = Options_Service::get_global_boolean_var('no_sso');
             $uses_me = false !== WordPress_Helpers::stripos($query, '/me/');
             $user_has_delegated_access = Access_Token_Service::user_has_delegated_access(get_current_user_id());
@@ -102,7 +103,7 @@ if (!class_exists('\Wpo\Services\Graph_Service')) {
                     $role = 'User.Read.All';
                 }
 
-                $access_token = Access_Token_Service::get_app_only_access_token($app_only_scope, $role);
+                $access_token = Access_Token_Service::get_app_only_access_token($app_only_scope, $role, $use_mail_config);
 
                 if (is_wp_error($access_token) && $user_has_delegated_access) {
                     Log_Service::write_log('WARN', sprintf('%s -> not application role found to match scope %s therefore falling back to delegated permissions', __METHOD__, $scope));

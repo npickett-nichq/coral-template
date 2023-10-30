@@ -22,7 +22,6 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
 
             // Do super admin stuff
             if ((is_admin() || is_network_admin()) && Permissions_Helpers::user_is_admin(\wp_get_current_user())) {
-
                 // Add and hide wizard (page)
                 add_action('admin_menu', '\Wpo\Pages\Wizard_Page::add_management_page');
                 add_action('network_admin_menu', '\Wpo\Pages\Wizard_Page::add_management_page');
@@ -113,7 +112,16 @@ if (!class_exists('\Wpo\Core\Wp_Hooks')) {
                     add_filter('pre_get_users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::get_users', 10, 1);
                     add_action('restrict_manage_users', '\Wpo\Services\Wp_To_Aad_Create_Update_Service::render_button_nok_users', 10, 1);
                 }
+
+                //  Ensure WP Cron job to check for each registered application whether its secret will epxire soon is added.
+
+                if (class_exists('\Wpo\Services\Password_Credentials_Service')) {
+                    \Wpo\Services\Password_Credentials_Service::ensure_check_password_credentials_expiration();
+                }
             } // End admin stuff
+
+            //  WP Cron job triggered action to check for each registered application whether its secret will epxire soon.
+            add_action('wpo_check_password_credentials_expiration', '\Wpo\Services\Password_Credentials_Service::check_password_credentials_expiration');
 
             // Auth.-only
             if (class_exists('\Wpo\Services\Auth_Only_Service')) {

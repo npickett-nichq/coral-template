@@ -122,13 +122,14 @@ function gamipress_render_plugin_card( $plugin ) {
     // Available actions for this plugin
     $action_links = array();
 
-    $details_link = esc_url( network_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug . '&TB_iframe=true&width=600&height=550' ) );
+    //$details_link = esc_url( network_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug . '&TB_iframe=true&width=600&height=550' ) );
+    $details_link = esc_url( 'https://gamipress.com/add-ons/' . $plugin->info->slug );
 
     if( gamipress_plugin_has_category( $plugin, '3rd-party' ) ) {
 
         $class = 'gamipress-third-party-add-on';
 
-        $details_link = '';
+        $details_link = esc_url( 'https://gamipress.com/add-ons/' . $plugin->info->slug );
 
         // "More Information" action
         $action_links[] = '<a href="https://gamipress.com/add-ons/' . $plugin->info->slug . '" class="button" target="_blank">' . __( 'More Information', 'gamipress' ) . '</a>';
@@ -136,7 +137,7 @@ function gamipress_render_plugin_card( $plugin ) {
     } else if( gamipress_plugin_has_category( $plugin, 'integrations' ) ) {
         $class = 'gamipress-integration-add-on';
 
-        $details_link = '';
+        $details_link = esc_url( 'https://gamipress.com/add-ons/' . $plugin->info->slug );
 
         // "More Information" action
         $action_links[] = '<a href="https://gamipress.com/add-ons/' . $plugin->info->slug . '" class="button" target="_blank">' . __( 'More Information', 'gamipress' ) . '</a>';
@@ -291,14 +292,14 @@ function gamipress_render_plugin_card( $plugin ) {
         <div class="plugin-card-top">
 
             <div class="thumbnail column-thumbnail">
-                <a href="<?php echo esc_url( $details_link ); ?>" class="thickbox open-plugin-details-modal">
+                <a href="<?php echo esc_url( $details_link ); ?>" class="open-plugin-details-modal" target="_blank">
                     <img src="<?php echo esc_attr( $plugin->info->thumbnail ) ?>" class="plugin-thumbnail" alt="">
                 </a>
             </div>
 
             <div class="name column-name">
                 <h3>
-                    <a href="<?php echo esc_url( $details_link ); ?>" class="thickbox open-plugin-details-modal">
+                    <a href="<?php echo esc_url( $details_link ); ?>" class="open-plugin-details-modal" target="_blank">
                         <?php echo $name; ?>
                     </a>
                 </h3>

@@ -417,16 +417,15 @@ if (!class_exists('\Wpo\Services\Access_Token_Service')) {
          *
          * @return mixed(stdClass|WP_Error) access token as object or WP_Error
          */
-        public static function get_app_only_access_token($scope = 'https://graph.microsoft.com/.default', $role = null)
+        public static function get_app_only_access_token($scope = 'https://graph.microsoft.com/.default', $role = null, $use_mail_config = false)
         {
             Log_Service::write_log('DEBUG', '##### -> ' . __METHOD__);
 
-            $use_mail_config = false;
-
             if (
-                Options_Service::get_global_boolean_var('use_graph_mailer')
-                && !empty($role)
-                && (false !== WordPress_Helpers::stripos($role, 'Mail.Send') || false !== WordPress_Helpers::stripos($role, 'Mail.ReadWrite'))
+                $use_mail_config || (Options_Service::get_global_boolean_var('use_graph_mailer')
+                    && !empty($role)
+                    && (false !== WordPress_Helpers::stripos($role, 'Mail.Send') || false !== WordPress_Helpers::stripos($role, 'Mail.ReadWrite'))
+                )
             ) {
                 $mail_directory_id = Options_Service::get_aad_option('mail_tenant_id');
                 $mail_application_id = Options_Service::get_aad_option('mail_application_id');

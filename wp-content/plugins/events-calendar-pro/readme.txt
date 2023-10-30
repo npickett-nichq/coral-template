@@ -4,8 +4,8 @@ Contributors: theeventscalendar, borkweb, bordoni, brianjessee, aguseo, camwynsp
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, the events calendar, widget, pro
 Donate link: https://evnt.is/29
 Requires at least: 6.1.0
-Stable tag: 6.2.1
-Tested up to: 6.3.1
+Stable tag: 6.2.3
+Tested up to: 6.3.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -214,6 +214,25 @@ Remember to always make a backup of your database and files before updating!
 
 == Changelog ==
 
+= [6.2.3] 2023-10-19 =
+
+* Fix - Organizer and venue views were not paginating to the past events due to a `past` flag getting lost during context switching. [ECP-1591]
+* Tweak - Updated recurrence pattern warning text when tickets are already attached. [ECP-1529]
+* Language - 1 new strings added, 0 updated, 0 fuzzied, and 1 obsoleted
+
+
+= [6.2.2] 2023-10-03 =
+
+* Version - Events Calendar PRO 6.2.2 is only compatible with The Events Calendar 6.2.3 and higher
+* Fix - Handle some issues with incorrect application of noindex meta tags. [TEC-4717]
+* Tweak - Updated focus state for relevant elements to have default outline ensuring improved accessibility and consistent browser behavior. [TEC-4888]
+* Tweak - Changed views: `v2/components/multi-venue/suffix`, `v2/widgets/shortcodes/components/after`, `v2/widgets/shortcodes/components/before`
+* Language - 0 new strings added, 7 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.2.1.1] 2023-09-28 =
+
+* Fix - Don't trigger `register_tec_telemetry_plugins()` from ECP [TEC-4920]
+
 = [6.2.1] 2023-09-05 =
 
 * Fix - In scenarios where the `wp_posts` table was larger than the base provisional ID (1000000), during activation of ECP the provisional ID could get rolled back to a lower value, causing conflicts with legitimate post IDs and provisional IDs. [ECP-1565]
@@ -222,6 +241,7 @@ Remember to always make a backup of your database and files before updating!
 * Fix - After a 6.0 migration, some recurring events with date instances that were marked as `same-time` would show wrong times in classic editor. This edge case should be resolved now. The underlying data was correct but the interface support was no longer handling `same-time` dates. [ECP-1511]
 * Fix - Modify output of additional fields for Event Automator to provide consistent output and prevent infinite growth of fields in Zapier. [EVA-103]
 * Tweak - Removed 'Series' post type from the list of available post types under "Tickets > Settings" in Event Tickets. [ECP-1568]
+* Tweak - Support the `post__not_recurring` query argument in CT1 queries to exclude Recurring Events from the results. [ET-1812]
 
 = [6.2.0] 2023-08-15 =
 
@@ -308,7 +328,7 @@ Remember to always make a backup of your database and files before updating!
 * Fix - During an update that splits a recurring event, in cases where there is a "Never Ends" limit it will now carry over to the right side of the split instead of setting an explicit "After X" limit. [ECP-1285]
 * Fix - Ensure full support for the translation of Series in WPML context. [ECP-1429]
 * Fix - Ensure post list displays correctly after quick edit of Events. [ECP-1261]
-* Fix - Fixes an issue after certain types of event updates, gutenberg would display "Changes you made may not be saved" alert. This was do to the post state being considered dirty when ID's changed in the response. [ECP-1452]
+* Fix - Fixes an issue after certain types of event updates, Gutenberg would display "Changes you made may not be saved" alert. This was do to the post state being considered dirty when ID's changed in the response. [ECP-1452]
 * Fix - In the admin sometimes link strings will be null in the `get_edit_post_link` hook callback. This will fix a fatal that was happening when string type was expected. [BTRIA-1689]
 * Fix - Language switcher link for Recurring Event Occurrences when using WPML. [ECP-1471]
 * Fix - Reload the Blocks Editor when breaking out an Event to avoid incoherent state. [ECP-1386]
@@ -576,7 +596,7 @@ Remember to always make a backup of your database and files before updating!
 = [5.12.1] 2022-02-15 =
 
 * Version - Events Calendar PRO 5.12.1 is only compatible with The Events Calendar 5.14.0 and higher.
-* Tweak - Remove the `wp.editor.InnerBlocks` gutenberg component in favor of `wp.blockEditor.InnerBlocks` which was deprecated since version 5.3. [ECP-1052]
+* Tweak - Remove the `wp.editor.InnerBlocks` Gutenberg component in favor of `wp.blockEditor.InnerBlocks` which was deprecated since version 5.3. [ECP-1052]
 * Tweak - Compatibility with the Common Abstract for editor blocks registration.
 * Fix - Major performance improvements gain from preventing improper load of Geolocation classes when not needed.
 * Fix - Prevent infinite loops in events manager when other plugins build the post. [ECP-1048]

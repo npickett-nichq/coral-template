@@ -1620,6 +1620,7 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 				'id'            => $id,
 				'attachment_id' => $wp_attachment_id,
 				'title'         => $title,
+				'description'   => wp_filter_nohtml_kses( $content ),
 				'activity_id'   => $video_activity_id,
 				'message_id'    => $message_id,
 				'album_id'      => ( ! empty( $args['album_id'] ) ? $args['album_id'] : false ),
@@ -1645,7 +1646,8 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 					update_post_meta( $wp_attachment_id, 'bp_video_activity_id', $video_activity_id );
 				}
 
-				// save video description while update.
+				// Added backward compatibility.
+				// Save video description while update.
 				if ( false !== $content ) {
 					$video_post['ID']           = $wp_attachment_id;
 					$video_post['post_content'] = wp_filter_nohtml_kses( $content );
@@ -1655,7 +1657,6 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 				bp_video_add_generate_thumb_background_process( $video_id );
 
 				$created_video_ids[] = $video_id;
-
 			}
 
 			if ( ! empty( $all_videos ) ) {
@@ -1919,23 +1920,52 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 	 */
 	protected function bp_video_ids_update_rest_field_callback( $object, $value, $attribute ) {
 
-		global $bp_activity_edit, $bp_video_upload_count, $bp_new_activity_comment, $bp_activity_post_update_id, $bp_activity_post_update;
+		global $bp_activity_edit, $bp_video_upload_count, $bp_new_activity_comment, $bp_activity_post_update_id, $bp_activity_post_update, $bb_activity_comment_edit, $bb_activity_comment_edit_id;
 
-		if ( 'bp_videos' !== $attribute ) {
+		$group_id = 0;
+		if ( 'groups' === $value->component ) {
+			$group_id = $value->item_id;
+		}
+
+		if ( 'activity_comment' === $value->type && ! empty( $value->secondary_item_id ) && ! empty( $value->item_id ) ) {
+			$parent_activity = new BP_Activity_Activity( (int) $value->item_id );
+			if ( ! empty( $parent_activity->id ) ) {
+				$group_id = $parent_activity->item_id;
+			}
+			unset( $parent_activity );
+		}
+
+		if (
+			'bp_videos' !== $attribute ||
+			(
+				function_exists( 'bb_video_user_can_upload' ) &&
+				! bb_video_user_can_upload( bp_loggedin_user_id(), (int) $group_id )
+			)
+		) {
 			$value->bp_videos = null;
 
 			return $value;
 		}
 
-		$bp_activity_edit = ( isset( $value->edit ) ? true : false );
-		// phpcs:ignore
-		$_POST['edit'] = $bp_activity_edit;
+		// Set variable if current action is edit activity comment.
+		$is_edit_activity_comment = $bb_activity_comment_edit && 'activity_comment' === $value->type && isset( $_POST['edit_comment'] );
 
-		if ( false === $bp_activity_edit && empty( $object ) ) {
-			return $value;
+		if ( $is_edit_activity_comment ) {
+			$bb_activity_comment_edit_id = $value->id;
+			if ( false === $bb_activity_comment_edit && empty( $object ) ) {
+				return $value;
+			}
+		} else {
+			$bp_activity_edit = ( isset( $value->edit ) ? true : false );
+			// phpcs:ignore
+			$_POST['edit'] = $bp_activity_edit;
+
+			if ( false === $bp_activity_edit && empty( $object ) ) {
+				return $value;
+			}
 		}
 
-		$bp_new_activity_comment = ( 'activity_comment' === $value->type ? $value->id : 0 );
+		$bp_new_activity_comment = ( ( 'activity_comment' === $value->type && false === $bb_activity_comment_edit ) ? $value->id : 0 );
 
 		$activity_id = $value->id;
 		$privacy     = $value->privacy;
@@ -1956,8 +1986,10 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 			}
 		}
 
-		$bp_activity_post_update    = true;
-		$bp_activity_post_update_id = $activity_id;
+		if ( ! $is_edit_activity_comment ) {
+			$bp_activity_post_update    = true;
+			$bp_activity_post_update_id = $activity_id;
+		}
 
 		if ( ! empty( $value->component ) && 'groups' === $value->component ) {
 			$group_id = $value->item_id;
@@ -1972,6 +2004,12 @@ class BP_REST_Video_Endpoint extends WP_REST_Controller {
 					bp_video_delete( array( 'id' => $video_id ), 'activity' );
 				}
 				bp_activity_delete_meta( $activity_id, 'bp_video_ids' );
+
+				// Delete media meta from activity for activity comment.
+				if ( $is_edit_activity_comment ) {
+					bp_activity_delete_meta( $activity_id, 'bp_video_id' );
+					bp_activity_delete_meta( $activity_id, 'bp_video_activity' );
+				}
 			}
 
 			return $value;

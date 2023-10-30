@@ -1,13 +1,13 @@
-﻿=== GamiPress - The most flexible and powerful gamification plugin for WordPress ===
+﻿=== GamiPress - The #1 gamification plugin to reward points, achievements, badges & ranks in WordPress ===
 Contributors: gamipress, rubengc, eneribs, pacogon, dioni00, flabernardez
 Tags: gamification, points, achievements, ranks, badges, awards, rewards, credits, engagement, leaderboard, emails, notifications, progress
 Requires at least: 4.4
 Tested up to: 6.3
-Stable tag: 3.6.0
+Stable tag: 5.1.0
 License: GNU AGPL v3.0
 License URI: http://www.gnu.org/licenses/agpl-3.0.html
 
-Reward your users with points, achievements, badges and ranks to increase your site activity and loyalty.
+Boost your gamification marketing & reward your users with points, achievements, badges & ranks to increase your site activity & loyalty!
 
 == Description ==
 
@@ -98,6 +98,7 @@ GamiPress integrates with a large number of plugins allowing you to add gamifica
 * [WPForms](https://gamipress.com/add-ons/wp-forms-integration/)
 * [Thrive Ovation](https://gamipress.com/add-ons/thrive-ovation-integration/)
 * [Thrive Leads](https://gamipress.com/add-ons/thrive-leads-integration/)
+* [Kadence Blocks](https://gamipress.com/add-ons/kadence-blocks-integration/)
 
 = Community integrations =
 
@@ -196,6 +197,16 @@ If you’re looking for something endorsed and maintained by the developers who 
 * [Zapier](https://gamipress.com/add-ons/gamipress-zapier/)
 
 [View all add-ons](https://gamipress.com/add-ons/)
+
+= 3rd party integrations =
+
+Other teams have integrated GamiPress into their products like plugins, apps and themes, including:
+
+* (ActiveMember360)[https://gamipress.com/add-ons/activemember360-integration/]
+* (Better Messages)[https://gamipress.com/add-ons/better-messages-integration/]
+* (Masteriyo)[https://gamipress.com/add-ons/masteriyo-integration/]
+
+[View all 3rd party integrations](https://gamipress.com/add-ons/#3rd-party)
 
 = More plugins from the GamiPress team =
 
@@ -320,6 +331,40 @@ No, We're unable to provide custom development services, as our focus is develop
 Also, you can check [our customize section](https://gamipress.com/customize/) where you can find a huge number of code snippets to help you customize GamiPress!
 
 == Changelog ==
+
+= 5.1.0 =
+
+* **Bug Fixes**
+* Fixed awards related to points earned with Bulk Awards.
+
+= 4.8.0 =
+
+* **Bug Fixes**
+* Fixed achieving ranks consecutively.
+
+= 4.5.0 =
+
+* **New Features**
+* New integration: Kadence Blocks.
+* Kadence Blocks: New event: Successful submit a form.
+* Kadence Blocks: New event: Successful submit a specific form.
+* Kadence Blocks: New event: Submit a specific field value.
+* Kadence Blocks: New event: Submit a specific field value on a specific form.
+
+= 4.2.0 =
+
+* **Improvements**
+* WooCommerce: Improved purchase event for a quantity to add larger quantities.
+* **Bug Fixes**
+* Advanced Custom Fields: Fixed user meta update event when the field is updated from the profile.
+
+= 3.9.0 =
+
+* **Improvements**
+* Improved Email Settings to add Site and User tags in footer text.
+* Updated GamiPress Add-ons section.
+* **Bug Fixes**
+* ARMember: Fixed compatibility with ARMember Complete Membership.
 
 = 3.6.0 =
 

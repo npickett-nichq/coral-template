@@ -61,7 +61,12 @@ function gamipress_armember_get_plan( ) {
 
     $membership_plans = array();
 
-    $obj_plans = new ARM_subscription_plans_Lite();
+    if( class_exists( 'ARM_subscription_plans' ) ) {
+		$obj_plans = new \ARM_subscription_plans();
+	} else {
+		$obj_plans = new \ARM_subscription_plans_Lite();
+	}
+
     $all_plans = $obj_plans->arm_get_all_subscription_plans( 'arm_subscription_plan_id, arm_subscription_plan_name' );
 
     foreach ( $all_plans as $plan ){
@@ -85,7 +90,12 @@ function gamipress_armember_get_plan_title( $plan_id ) {
         return '';
     }
 
-    $obj_plans = new \ARM_subscription_plans_Lite();
+    if( class_exists( 'ARM_subscription_plans' ) ) {
+		$obj_plans = new \ARM_subscription_plans();
+	} else {
+		$obj_plans = new \ARM_subscription_plans_Lite();
+	}
+    
     $plan_name = $obj_plans->arm_get_plan_name_by_id( $plan_id );
 
     return $plan_name;

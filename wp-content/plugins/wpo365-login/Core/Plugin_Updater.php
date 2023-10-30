@@ -94,12 +94,21 @@ class Plugin_Updater
             $force_check = isset($_GET['action']) && 'force_plugin_updates_check' == $_GET['action']; // https://wordpress.org/plugins/force-plugin-updates-check/
             $recently_checked = !empty($wpo365_plugins_updated) && isset($wpo365_plugins_updated['last_checked']) && time() - $wpo365_plugins_updated['last_checked'] < 12 * HOUR_IN_SECONDS;
 
+            if (!$force_check && function_exists('get_current_screen')) {
+
+                $current_screen = get_current_screen();
+
+                if (!empty($current_screen) && ($current_screen->id == 'plugins' || $current_screen->id == 'update-core')) {
+                    $force_check = true;
+                }
+            }
+
             if (!$force_check && $recently_checked) {
                 return $transient_data;
             }
 
             \Wpo\Core\Plugin_Updater::check_licenses();
-            \Wpo\Core\Plugin_Updater::check_for_updates($transient_data);
+            $transient_data = \Wpo\Core\Plugin_Updater::check_for_updates($transient_data);
 
             set_site_transient('wpo365_plugins_updated', array('last_checked' => time()));
             return $transient_data;
@@ -118,7 +127,7 @@ class Plugin_Updater
      * 
      * Changed to EDD plugin updater since 7.15
      * 
-     * @return void
+     * @return object $transient_data
      */
     public static function check_for_updates($transient_data = null)
     {
@@ -155,12 +164,13 @@ class Plugin_Updater
                     'item_id'       => $store_item_id,                                              // ID of the product
                     'author'        => 'support@wpo365.com',                                        // author of this plugin
                     'beta'          => false,
-                    'wp_override'   => true,
                 )
             );
 
-            $updater->check_update($transient_data);
+            $transient_data = $updater->check_update($transient_data);
         }
+
+        return $transient_data;
     }
 
     public static function check_licenses()

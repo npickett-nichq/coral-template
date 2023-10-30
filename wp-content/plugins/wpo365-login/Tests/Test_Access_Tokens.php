@@ -1079,16 +1079,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                 return $test_result;
             }
 
-            // Check if custom domain is configured 
-            $custom_domain = Options_Service::get_global_list_var('custom_domain');
-
-            if (!$this->use_b2c && empty($custom_domain)) {
-                $test_result->passed = false;
-                $test_result->message = "You have not configured at least one custom domain. Please check your <a href=\"https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Domains\" target=\"_blank\">Custom domain names</a> in Azure Portal and add the domain names on the plugin's <a href=\"#userRegistration\">User registration</a> configuration page accordingly. Please press '+' after each entry to add the custom domain name to the list.";
-                $test_result->more_info = 'https://docs.wpo365.com/article/48-custom-domains';
-                return $test_result;
-            }
-
             $allowed_urls = Options_Service::get_global_list_var('pages_blacklist');
             $found = false;
 
@@ -1109,22 +1099,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                         'op' => 'add',
                         'value' => array(
                             'pagesBlacklist' => '/wp-json/wpo365/v1/',
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            // Check if the Graph API has been enabled (for SYNC QUERY TESTER)
-            if (!Options_Service::get_global_boolean_var('enable_graph_api')) {
-                $test_result->passed = false;
-                $test_result->message = 'You must <em>Enable WPO365 API for Microsoft Graph</em> on the plugin\'s <a href="#integration">Integration</a> configuration page to be able to test the (user synchronization) query.';
-                $test_result->more_info = 'https://docs.wpo365.com/article/57-synchronize-users-from-azure-ad-to-wordpress';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'replace',
-                        'value' => array(
-                            'enableGraphApi' => true,
                         ),
                     ),
                 );
@@ -1172,57 +1146,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                 $test_result->passed = false;
                 $test_result->message = 'Unknow error occurred [class could not be loaded].';
                 $test_result->more_info = 'https://docs.wpo365.com/article/57-synchronize-users-from-azure-ad-to-wordpress';
-            }
-
-            $allowed_endpoints_and_permissions = Options_Service::get_global_list_var('graph_allowed_endpoints');
-            $users_endpoint_ok = false;
-            $myorganization_endpoint_ok = false;
-
-            foreach ($allowed_endpoints_and_permissions as $allowed_endpoint_config) {
-
-                if (WordPress_Helpers::stripos($allowed_endpoint_config['key'], '/users') > 0) {
-                    $users_endpoint_ok = true;
-                    continue;
-                }
-
-                if (WordPress_Helpers::stripos($allowed_endpoint_config['key'], '/myorganization') > 0) {
-                    $myorganization_endpoint_ok = true;
-                    continue;
-                }
-            }
-
-            if (!$users_endpoint_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must add the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page: https://graph.microsoft.com/_/users.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'add',
-                        'value' => array(
-                            'graphAllowedEndpoints' => array(
-                                'key' => 'https://graph.microsoft.com/_/users',
-                                'boolVal' => false,
-                            ),
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            if (!$myorganization_endpoint_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must add the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page: https://graph.microsoft.com/_/myorganization.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'add',
-                        'value' => array(
-                            'graphAllowedEndpoints' => array(
-                                'key' => 'https://graph.microsoft.com/_/myorganization',
-                                'boolVal' => false,
-                            ),
-                        ),
-                    ),
-                );
-                return $test_result;
             }
 
             return $test_result;
@@ -1283,16 +1206,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                 return $test_result;
             }
 
-            // Check if custom domain is configured 
-            $custom_domain = Options_Service::get_global_list_var('custom_domain');
-
-            if (!$this->use_b2c && empty($custom_domain)) {
-                $test_result->passed = false;
-                $test_result->message = "You have not configured at least one custom domain. Please check your <a href=\"https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Domains\" target=\"_blank\">Custom domain names</a> in Azure Portal and add the domain names on the plugin's <a href=\"#userRegistration\">User registration</a> configuration page accordingly. Please press '+' after each entry to add the custom domain name to the list.";
-                $test_result->more_info = 'https://docs.wpo365.com/article/48-custom-domains';
-                return $test_result;
-            }
-
             $allowed_urls = Options_Service::get_global_list_var('pages_blacklist');
             $found = false;
 
@@ -1313,22 +1226,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                         'op' => 'add',
                         'value' => array(
                             'pagesBlacklist' => '/wp-json/wpo365/v1/',
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            // Check if the Graph API has been enabled (for SYNC QUERY TESTER)
-            if (!Options_Service::get_global_boolean_var('enable_graph_api')) {
-                $test_result->passed = false;
-                $test_result->message = 'You must <em>Enable WPO365 API for Microsoft Graph</em> on the plugin\'s <a href="#integration">Integration</a> configuration page to be able to test the (user synchronization) query.';
-                $test_result->more_info = 'https://docs.wpo365.com/article/57-synchronize-users-from-azure-ad-to-wordpress';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'replace',
-                        'value' => array(
-                            'enableGraphApi' => true,
                         ),
                     ),
                 );
@@ -1376,101 +1273,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                 $test_result->passed = false;
                 $test_result->message = 'Unknow error occurred [class could not be loaded].';
                 $test_result->more_info = 'https://docs.wpo365.com/article/57-synchronize-users-from-azure-ad-to-wordpress';
-            }
-
-            $allowed_endpoints_and_permissions = Options_Service::get_global_list_var('graph_allowed_endpoints');
-            $users_endpoint_ok = false;
-            $users_endpoint_app_only_ok = false;
-            $myorganization_endpoint_ok = false;
-            $myorganization_endpoint_app_only_ok = false;
-
-            for ($i = 0; $i < sizeof($allowed_endpoints_and_permissions); $i++) {
-
-                if (WordPress_Helpers::stripos($allowed_endpoints_and_permissions[$i]['key'], '/users') > 0) {
-                    $users_endpoint_ok = true;
-
-                    if (false === $allowed_endpoints_and_permissions[$i]['boolVal']) {
-                        $allowed_endpoints_and_permissions[$i]['boolVal'] = true;
-                    } else {
-                        $users_endpoint_app_only_ok = true;
-                    }
-
-                    continue;
-                }
-
-                if (WordPress_Helpers::stripos($allowed_endpoints_and_permissions[$i]['key'], '/myorganization') > 0) {
-                    $myorganization_endpoint_ok = true;
-
-                    if (false === $allowed_endpoints_and_permissions[$i]['boolVal']) {
-                        $allowed_endpoints_and_permissions[$i]['boolVal'] = true;
-                    } else {
-                        $myorganization_endpoint_app_only_ok = true;
-                    }
-
-                    continue;
-                }
-            }
-
-            if (!$users_endpoint_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must add the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page: https://graph.microsoft.com/_/users.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'add',
-                        'value' => array(
-                            'graphAllowedEndpoints' => array(
-                                'key' => 'https://graph.microsoft.com/_/users',
-                                'boolVal' => true,
-                            ),
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            if (!$users_endpoint_app_only_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must remove the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page and then add it again and check the box to allow application-level access: https://graph.microsoft.com/_/users.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'replace',
-                        'value' => array(
-                            'graphAllowedEndpoints' => $allowed_endpoints_and_permissions,
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            if (!$myorganization_endpoint_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must add the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page: https://graph.microsoft.com/_/myorganization.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'add',
-                        'value' => array(
-                            'graphAllowedEndpoints' => array(
-                                'key' => 'https://graph.microsoft.com/_/myorganization',
-                                'boolVal' => true,
-                            ),
-                        ),
-                    ),
-                );
-                return $test_result;
-            }
-
-            if (!$myorganization_endpoint_app_only_ok) {
-                $test_result->passed = false;
-                $test_result->message = 'You must remove the following entry to the list of <em>Allowed endpoints</em> on the plugin\'s <a href="#integration">Integration</a> configuration page and then add it again and check the box to allow application-level access: https://graph.microsoft.com/_/myorganization.';
-                $test_result->fix = array(
-                    array(
-                        'op' => 'replace',
-                        'value' => array(
-                            'graphAllowedEndpoints' => $allowed_endpoints_and_permissions,
-                        ),
-                    ),
-                );
-                return $test_result;
             }
 
             return $test_result;
@@ -1562,16 +1364,6 @@ if (!class_exists('\Wpo\Tests\Test_Access_Tokens')) {
                         ),
                     ),
                 );
-                return $test_result;
-            }
-
-            // Check if custom domain is configured 
-            $custom_domain = Options_Service::get_global_list_var('custom_domain');
-
-            if (empty($custom_domain)) {
-                $test_result->passed = false;
-                $test_result->message = "You have not configured at least one custom domain. Please check your <a href=\"https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Domains\" target=\"_blank\">Custom domain names</a> in Azure Portal and add the domain names on the plugin's <a href=\"#userRegistration\">User registration</a> configuration page accordingly. Please press '+' after each entry to add the custom domain name to the list.";
-                $test_result->more_info = 'https://docs.wpo365.com/article/48-custom-domains';
                 return $test_result;
             }
 
