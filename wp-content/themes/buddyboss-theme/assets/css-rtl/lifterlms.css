@@ -2951,7 +2951,8 @@ body:not(.has-sidebar) .llms-student-dashboard:not(.dashboard) .llms-sd-notifica
   margin: 15px 0;
   padding: 15px 25px;
 }
-.single-course.llms-pointer .llms-meta-info h3 {
+.single-course.llms-pointer .llms-meta-info h3,
+.single-course.llms-pointer .llms-meta-info .llms-meta-title {
   font-size: 16px;
   text-transform: uppercase;
 }
@@ -3313,7 +3314,7 @@ body:not(.has-sidebar) .llms-student-dashboard:not(.dashboard) .llms-sd-notifica
 }
 .llms-syllabus-wrapper .llms-lesson-preview .ld-item-details .ld-expand-button .ld-icon-arrow-down:before {
   content: "\e861";
-  font: normal normal normal 9px/1 bb-icons;
+  font: normal normal normal 18px/1 bb-icons;
   speak: none;
   text-decoration: inherit;
   text-transform: none;
@@ -4728,7 +4729,8 @@ body.llms-pointer.llms-inner.buddypanel-open:not(.buddypanel-header) .site-heade
 .lifterlms-lessions-list .llms-syllabus-wrapper .llms-lesson-link .llms-main .llms-pre-text {
   display: none;
 }
-.lifterlms-lessions-list .llms-syllabus-wrapper .llms-lesson-link .llms-main h5 {
+.lifterlms-lessions-list .llms-syllabus-wrapper .llms-lesson-link .llms-main h5,
+.lifterlms-lessions-list .llms-syllabus-wrapper .llms-lesson-link .llms-main .llms-lesson-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5161,7 +5163,8 @@ body.llms-pointer.llms-inner.buddypanel-open:not(.buddypanel-header) .site-heade
       -ms-flex: 1;
           flex: 1;
 }
-.llms-syllabus-wrapper .llms-lesson-link h5 {
+.llms-syllabus-wrapper .llms-lesson-link h5,
+.llms-syllabus-wrapper .llms-lesson-link .llms-lesson-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--bb-headings-color);

@@ -141,20 +141,6 @@ switch ( $context ) {
 
 			</div>
 
-			<?php
-			if ( ( is_user_logged_in() ) && ( true === $has_access ) ) {
-				learndash_get_template_part(
-					'modules/progress.php',
-					array(
-						'context'   => 'topic',
-						'user_id'   => $user_id,
-						'course_id' => $course_id,
-						'post'      => $post,
-					),
-					true
-				);
-			}
-			?>
 		</div>
 
 		<?php
@@ -190,21 +176,6 @@ switch ( $context ) {
 				?>
 
 			</div> <!--/.ld-breadcrumbs-->
-
-			<?php
-			if ( ( is_user_logged_in() ) && ( true === $has_access ) ) {
-				learndash_get_template_part(
-					'modules/progress.php',
-					array(
-						'context'   => 'topic',
-						'user_id'   => $user_id,
-						'course_id' => $course_id,
-						'post'      => $post,
-					),
-					true
-				);
-			}
-			?>
 		</div>
 
 		<?php

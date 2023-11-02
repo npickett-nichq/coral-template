@@ -215,6 +215,7 @@ class Boss_Follow_Us extends WP_Widget {
 		$instagram = ( ! empty( $instance['instagram'] ) ) ? $instance['instagram'] : '';
 		$linkedin  = ( ! empty( $instance['linkedin'] ) ) ? $instance['linkedin'] : '';
 		$x         = ( ! empty( $instance['x'] ) ) ? $instance['x'] : '';
+		$tiktok    = ( ! empty( $instance['tiktok'] ) ) ? $instance['tiktok'] : '';
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
 		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
@@ -255,6 +256,10 @@ class Boss_Follow_Us extends WP_Widget {
 			echo '<a href="' . esc_url( $x ) . '" target="_blank"><i class="bb-icon-bf bb-icon-brand-x"></i></a>';
 		}
 
+		if ( ! empty( $tiktok ) ) {
+			echo '<a href="' . esc_url( $tiktok ) . '" target="_blank"><i class="bb-icon-bf bb-icon-brand-tiktok"></i></a>';
+		}
+
 		echo '</div>';
 
 		echo $args['after_widget'];
@@ -281,6 +286,7 @@ class Boss_Follow_Us extends WP_Widget {
 		$instance['instagram'] = esc_url_raw( $new_instance['instagram'] );
 		$instance['linkedin']  = esc_url_raw( $new_instance['linkedin'] );
 		$instance['x']         = esc_url_raw( $new_instance['x'] );
+		$instance['tiktok']    = esc_url_raw( $new_instance['tiktok'] );
 
 		return $instance;
 	}
@@ -302,6 +308,7 @@ class Boss_Follow_Us extends WP_Widget {
 		$instagram = isset( $instance['instagram'] ) ? esc_url( $instance['instagram'] ) : '';
 		$linkedin  = isset( $instance['linkedin'] ) ? esc_url( $instance['linkedin'] ) : '';
 		$x         = isset( $instance['x'] ) ? esc_url( $instance['x'] ) : '';
+		$tiktok    = isset( $instance['tiktok'] ) ? esc_url( $instance['tiktok'] ) : '';
 
 		?>
 		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'buddyboss-theme' ); ?></label>
@@ -321,6 +328,10 @@ class Boss_Follow_Us extends WP_Widget {
 		<p>
 			<label for="<?php echo $this->get_field_id( 'x' ); ?>"><?php _e( 'X Link:', 'buddyboss-theme' ); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id( 'x' ); ?>" name="<?php echo $this->get_field_name( 'x' ); ?>" type="url" value="<?php echo $x; ?>" />
+		</p>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'tiktok' ) ); ?>"><?php esc_html_e( 'TikTok Link:', 'buddyboss-theme' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'tiktok' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'tiktok' ) ); ?>" type="url" value="<?php echo esc_attr( $tiktok ); ?>" />
 		</p>
 		<?php
 	}

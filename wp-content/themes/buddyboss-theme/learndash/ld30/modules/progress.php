@@ -91,8 +91,9 @@ if ( 'topic' !== $context ) {
 		);
 	}
 } else {
-	// global $post;
-
+	if ( ! isset( $post ) ) {
+		global $post;
+	}
 	/** This filter is documented in themes/ld30/templates/modules/progress.php */
 	$progress = apply_filters( 'learndash-' . $context . '-progress-stats', learndash_lesson_progress( $post, $course_id ) );
 }

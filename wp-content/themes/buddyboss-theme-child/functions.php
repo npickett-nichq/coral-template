@@ -108,10 +108,10 @@ add_filter( 'bbp_get_form_topic_subscribed', 'notify_of_new_replies_by_default',
 
 add_action( 'bp_dd_create_forums_topics', 'bbp_add_user_topic_subscription' );
 
-/* hide wp login fields 
+/* hide wp login fields */
 function login_go_sso() { ?>
   <style type="text/css">
-      .login-heading span { display: none; }
+      .login-heading h2, .login-heading span { display: none; }
       #user_label { display: none; }
       #user_login { display: none; }
       .user-pass-wrap { display: none; }
@@ -120,7 +120,7 @@ function login_go_sso() { ?>
       .submit { display: none; }
   </style>
 <?php }
-add_action( 'login_enqueue_scripts', 'login_go_sso' ); */
+add_action( 'login_enqueue_scripts', 'login_go_sso' ); 
 
 /* workaround code to get TEC views to work right */
 $bypass_forced_default = function ( $private_check ) use ( &$bypass_forced_default ) {
@@ -133,4 +133,35 @@ $add_check = function ( $query ) use ( $bypass_forced_default ) {
 };
 add_filter( 'tribe_rewrite_parse_query_vars', $add_check, 1 );
 
+/* add footer to login page */
+function footer_for_login() {
+  echo '<div style="background-color:#122123;color:#fff;display:flex;justify-content:space-between;padding:12px 48px;position:fixed;left:0;bottom:0;width:100%;height:124px;">';
+  echo '<div style="order:1;"><a href="https://nichq.org"><img src="http://localhost:8888/coral/wp-content/uploads/2023/10/NICHQ_Logo_Vertical_White_042519_MJB-1.png" width="250" height="100"></a></div>';
+  echo '<div style="order:2;flex-grow;2;margin:auto 0;"><p>© 2023 National Institute for Children\'s Health Quality. All rights reserved.</p></div>';
+  echo '<div style="order:3;margin:auto 0;"><ul class="footer-socials" style="display:flex;flex-flow:row wrap;list-style:none;justify-content:flex-end;margin:0 0 0 auto;font-size:32px;font-weight:200;">
+    <li><a href="https://www.facebook.com/NICHQ/" target="_blank" data-balloon-pos="up" data-balloon="facebook"><i class="bb-icon-f bb-icon-brand-facebook"></i></a></li>
+    <li><a href="https://www.instagram.com/NICHQ_org/" target="_blank" data-balloon-pos="up" data-balloon="instagram"><i class="bb-icon-f bb-icon-brand-instagram"></i></a></li>
+    <li><a href="https://www.linkedin.com/company/nichq" target="_blank" data-balloon-pos="up" data-balloon="linkedin"><i class="bb-icon-f bb-icon-brand-linkedin"></i></a></li>
+    <li><a href="https://twitter.com/NICHQ" target="_blank" data-balloon-pos="up" data-balloon="twitter"><i class="bb-icon-f bb-icon-brand-twitter"></i></a></li>
+    <li><a href="https://www.youtube.com/user/NICHQCommunications" target="_blank" data-balloon-pos="up" data-balloon="youtube"><i class="bb-icon-f bb-icon-brand-youtube"></i></a></li>
+    </ul></div>';
+  echo '</div>';
+  echo '<style>.footer-socials li a { color:#fff !important; }
+  .footer-socials li a:hover { color:#AACE6D !important; }
+  .help-text { text-align:center; padding-top:12px; }
+  #login a { color: #254E8C !important; } 
+  #login a:hover { text-decoration:underline; }</style>';
+}
+add_action( 'login_footer', 'footer_for_login' );
+
+function add_help_text() {
+  echo '<script>
+    var parent = document.getElementById("login");
+    var child = document.createElement("div");
+    child.classList.add("help-text");
+    child.innerHTML = "<p>Need an account or forgot your password?</p><p>Contact <a href=\'mailto:webmaster@nichq.org\'>webmaster@nichq.org</a></p>";
+    parent.appendChild(child);
+    </script>';
+}
+add_action( 'login_footer', 'add_help_text' );
 ?>

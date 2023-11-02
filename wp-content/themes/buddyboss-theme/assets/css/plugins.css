@@ -3292,6 +3292,9 @@ div.wpforms-container-full .wpforms-form .wpforms-field-credit-card-expiration s
 .bp-user-blog .sap-editor-area-wrapper .medium-editor-element {
   padding: 0;
 }
+.bp-user-blog .sap-editor-area-wrapper .sap-editable-title.medium-editor-element.medium-editor-placeholder:after {
+  pointer-events: none;
+}
 .bp-user-blog #sap-widget-container .widget {
   border: 0;
   margin: 0 0 20px;

@@ -43,7 +43,15 @@ if ( ! empty( $link_embed ) ) {
 		<div class="activity-header">
 			<?php bp_activity_action(); ?>
 			<p class="activity-date">
-				<a href="<?php echo esc_url( bp_activity_get_permalink( bp_get_activity_id() ) ); ?>"><?php echo bp_core_time_since( bp_get_activity_date_recorded() ); ?></a>
+				<a href="<?php echo esc_url( bp_activity_get_permalink( bp_get_activity_id() ) ); ?>">
+					<?php
+					printf(
+						'<span class="time-since" data-livestamp="%1$s">%2$s</span>',
+						bp_core_get_iso8601_date( bp_get_activity_date_recorded() ),
+						bp_core_time_since( bp_get_activity_date_recorded() )
+					);
+					?>
+				</a>
 				<?php
 				if ( function_exists( 'bp_nouveau_activity_is_edited' ) ) {
 					bp_nouveau_activity_is_edited();

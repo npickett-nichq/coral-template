@@ -267,6 +267,10 @@ if ( ! class_exists( '\BuddyBossTheme\BBPressHelper' ) ) {
 				add_filter( 'bbp_get_reply_content', 'bbp_make_clickable', 4 );
 			}
 
+			if ( ! has_filter( 'bbp_get_reply_content', 'convert_smilies' ) ) {
+				add_filter( 'bbp_get_reply_content', 'convert_smilies', 20 );
+			}
+
 			if ( function_exists( 'bp_media_forums_embed_attachments' ) && ! has_filter( 'bbp_get_reply_content', 'bp_media_forums_embed_attachments' ) ) {
 				add_filter( 'bbp_get_reply_content', 'bp_media_forums_embed_attachments', 999, 2 );
 			}

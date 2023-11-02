@@ -5,7 +5,11 @@
             var elem = this,
                 $elem = $( this );
 
-            window.addEventListener( 'resize', run_alignMenu );
+            window.addEventListener( 'resize', function() {
+                setTimeout( function() {
+                    run_alignMenu();
+                }, 300);
+            } );
             window.addEventListener( 'load', run_alignMenu );
 
             function run_alignMenu() {

@@ -313,7 +313,8 @@ function buddyboss_login_scripts() {
 			var loginHeight = function() {
 
 				jQuery( 'body.login.login-split-page #login' ).each(function() {
-					var $loginH = jQuery( 'body.login.login-split-page #login' ).height();
+					var languageSwitch = jQuery( '.language-switcher').length > 0 ? jQuery( '.language-switcher').height() : 0;
+					var $loginH = jQuery( 'body.login.login-split-page #login' ).height() + languageSwitch;
 					var $winH = jQuery( window ).height();
 
 					if ( $loginH > $winH ) {
@@ -328,12 +329,20 @@ function buddyboss_login_scripts() {
 			// Re-position WP Language Switcher below Login Form
 			var langSwitchPosition = function() {
 				if( jQuery( 'body' ).hasClass( 'login-split-page' ) && jQuery( '.language-switcher').length  ) {
-					var loginBlockHeight = jQuery( '#login' ).height() + jQuery( '#login' ).offset().top;
+					var LoginOffset =  jQuery( '#login' ).offset().top > 0 ? jQuery( '#login' ).offset().top : 0;
+					var loginBlockHeight = jQuery( '#login' ).height() + LoginOffset + 15;
 					jQuery( '.language-switcher' ).css( 'top', loginBlockHeight + 'px' );
 				}
 			}
 
 			langSwitchPosition();
+
+			if( jQuery( '#login .bs-cs-login-logo' ).length ) {
+				jQuery( '.bs-cs-login-logo' ).load( function() {
+					loginHeight();
+					langSwitchPosition();
+				});
+			}
 
 			jQuery( window ).on( 'resize', function () {
 				loginHeight();

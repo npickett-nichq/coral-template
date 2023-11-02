@@ -2978,12 +2978,12 @@ body.bb-template-v2:not(.buddypanel-open) .buddypanel.buddypanel--toggle-off .bu
   font-size: 18px;
 }
 
-.bb-template-v2.single-course.llms-pointer .llms-meta-info h3, .bb-template-v2.single-course.llms-pointer .llms-instructor-info h3, .bb-template-v2.single-course.llms-pointer .lifterlms_course_information h3,
+.bb-template-v2.single-course.llms-pointer .llms-meta-info h3, .bb-template-v2.single-course.llms-pointer .llms-meta-info .llms-meta-title, .bb-template-v2.single-course.llms-pointer .llms-instructor-info h3, .bb-template-v2.single-course.llms-pointer .lifterlms_course_information h3,
 .bb-template-v2 .bb-llms-content-wrap .review_title,
 .bb-template-v2 .bb-llms-content-wrap .comments-title {
   text-transform: none;
 }
-.bb-template-v2.single-course.llms-pointer .llms-meta-info h3, .bb-template-v2.single-course.llms-pointer .llms-instructor-info h3,
+.bb-template-v2.single-course.llms-pointer .llms-meta-info h3, .bb-template-v2.single-course.llms-pointer .llms-meta-info .llms-meta-title, .bb-template-v2.single-course.llms-pointer .llms-instructor-info h3,
 .bb-template-v2 .bb-llms-content-wrap .review_title,
 .bb-template-v2 .bb-llms-content-wrap .comments-title {
   font-size: 18px;

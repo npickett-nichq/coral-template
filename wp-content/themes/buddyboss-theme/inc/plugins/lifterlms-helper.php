@@ -140,6 +140,7 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 			add_action( 'llms_user_removed_from_course', [ $this, 'bb_flush_llms_mycourse_ids_cache_user_id' ], 9999, 1 );
 			add_action( 'llms_user_enrollment_deleted', [ $this, 'bb_flush_llms_mycourse_ids_cache_user_id' ], 9999, 1 );
 
+			add_filter( 'llms_course_meta_info_title_size', [ $this, 'bb_llms_course_meta_info_title_size' ], 9999, 1 );
 		}
 
 		/**
@@ -2253,6 +2254,23 @@ if ( ! class_exists( '\BuddyBossTheme\LifterLMSHelper' ) ) {
 			}
 
 			return $taxonomy;
+		}
+
+		/**
+		 * Function to change tag to follow heading hierarchy for SEO compatibility.
+		 *
+		 * @since 2.4.30
+		 *
+		 * @param string $title_tag Title tag.
+		 *
+		 * @return string
+		 */
+		public function bb_llms_course_meta_info_title_size( $title_tag ) {
+			if ( 'h2' !== $title_tag ) {
+				$title_tag = 'h2';
+			}
+
+			return $title_tag;
 		}
 	}
 }

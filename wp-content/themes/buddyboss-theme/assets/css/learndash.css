@@ -6050,6 +6050,9 @@ ul.bb-lms-user-profile-tabs .more-button.active:after {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  font-size: 16px;
+  line-height: 1.6875rem;
+  margin: 0;
 }
 .lms-topic-sidebar-wrapper .lms-topic-sidebar-data {
   padding: 15px 0;

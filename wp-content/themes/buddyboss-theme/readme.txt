@@ -1,8 +1,8 @@
 === BuddyBoss Theme ===
 Contributors: BuddyBoss
 Requires at least: 4.9.1
-Tested up to: 6.2.2
-Version: 2.4.20
+Tested up to: 6.3.2
+Version: 2.4.40
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,34 @@ BuddyBoss Theme is a community theme for the BuddyBoss Platform.
 4. Upload the file 'buddyboss-theme-child.zip'
 
 == Changelog ==
+
+= 2.4.40 =
+* Enhancement: Elementor - show a notice to customers when a template can’t be installed properly due to missing requirements
+* Enhancement: Profiles - Added TikTok to Social Network Links
+* Bug: Core - The date field from WP Job Manager Applications form is not working as intended with BuddyBoss theme
+* Bug: Forums - Youtube links were not shown correctly in forum topic replies with / without additional text
+* Bug: LearnDash - section headings were not matching
+* Bug: Profiles - Profile header items are overlapping when the alignment is set to Left
+* Bug: Styling - Search Form reset button styling issue when inviting users during group creation process on the frontend
+* Bug: Styling - White line on the group's manage page when the background is black
+* Bug: Theme Styling - Alignment issues on user Profile page when resizing the browser window
+* Bug: Theme Styling - Member connection list was broken when using vertical profile menu
+
+= 2.4.30 =
+* New Feature! - Allow users to Edit Activity Comments
+* Bug: Blog - Body font size set in Theme Options was not being respected on blog posts
+* Bug: Blog - User Blog title input did not focus on first click
+* Bug: BuddyPanel - Using sections in the BuddyPanel was causing a glitch due to min height size
+* Bug: Core - Header menu and footer menu did not show properly In landscape position
+* Bug: Core - Login Page Language switcher was overlapping the login button
+* Bug: Core - Text Smilies were not converting to emojis when first added in discussions reply.
+* Bug: Core - unable to scroll to end of page in Activity Feed to show footer even if no posts left to load
+* Bug: Core - When pagination links went to 3 digit page links this would break the theme styling
+* Bug: Forums - Lesson progress bar was duplicated on single topic page
+* Bug: Gutenberg - No margin showing at the bottom of the image when using the image block aligned to Center
+* Bug: LifterLMS - Incorrect heading structure in single course page where course content is displayed
+* Bug: LifterLMS - Users were unable to write review in LifterLMS quiz
+* Bug: The Events Calendar - now able to translate the Previous and Next event buttons
 
 = 2.4.20 =
 * Bug: Activity - When quick replying to forum discussion within the Activity Feed a console error would show

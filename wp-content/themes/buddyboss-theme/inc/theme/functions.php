@@ -385,6 +385,12 @@ function buddyboss_theme_scripts() {
 	}
 	if ( class_exists( 'Tribe__Events__Main' ) ) {
 		wp_enqueue_script( 'buddyboss-theme-tec-js', get_template_directory_uri() . '/assets/js/plugins/bb-tec' . $minjs . '.js', array( 'jquery' ), buddyboss_theme()->version(), true );
+		wp_localize_script( 'buddyboss-theme-tec-js', 'buddyboss_theme_tec_js',
+			array( 
+				'prev_event_string' => __( 'Previous Event', 'buddyboss-theme' ),
+				'next_event_string' => __( 'Next Event', 'buddyboss-theme' ),
+			)
+		);
 	}
 	if ( class_exists( 'GamiPress' ) ) {
 		wp_enqueue_script( 'buddyboss-theme-gamipress-js', get_template_directory_uri() . '/assets/js/plugins/gamipress' . $minjs . '.js', array( 'jquery' ), buddyboss_theme()->version(), true );

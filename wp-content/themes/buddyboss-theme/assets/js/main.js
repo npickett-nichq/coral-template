@@ -545,7 +545,7 @@
 			// BuddyPanel Menu li height
 			function buddyPanelMenuHeight() {
 				if ( $( '.buddypanel .side-panel-menu' ).length ) {
-					$( '.buddypanel .side-panel-menu li > a' ).each(
+					$( '.buddypanel .side-panel-menu li:not(.bb-menu-section) > a' ).each(
 						function () {
 							var buddyPanelMenuHeight = $( this ).outerHeight();
 							if( buddyPanelMenuHeight !== $( this ).parent().outerHeight() ){
@@ -853,7 +853,7 @@
 					$( '.bb-sticky-sidebar' ).stick_in_parent( { spacer: false, offset_top: offsetTop } );
 				} );
 
-				$( '.bb-sticky-sidebar' ).parent( '#secondary' ).css( 'min-height', $( '.bb-sticky-sidebar' ).height() );
+				$( '.bb-sticky-sidebar' ).parent( '#secondary, #user-activity' ).css( 'min-height', $( '.bb-sticky-sidebar' ).height() );
 			}
 
 			var mediaQuery = '( max-width: 1081px )';
@@ -868,7 +868,7 @@
 			} );
 
 			$( window ).resize( function () {
-				$( '.bb-sticky-sidebar' ).parent( '#secondary' ).css( 'min-height', $( '.bb-sticky-sidebar' ).height() );
+				$( '.bb-sticky-sidebar' ).parent( '#secondary, #user-activity' ).css( 'min-height', $( '.bb-sticky-sidebar' ).height() );
 			} );
 
 			if ( $( '.bb-sticky-sidebar' ).length > 0 ) {
@@ -1452,7 +1452,14 @@
 			}
 
 			if ( typeof ( primaryNav ) != 'undefined' && primaryNav != null ) {
-				window.onresize = navListOrder;
+				$( window ).on(
+					'resize',
+					function () {
+						setTimeout( function() {
+							navListOrder();
+						}, 300 );
+					}
+				);
 				navListOrder();
 
 				setTimeout(

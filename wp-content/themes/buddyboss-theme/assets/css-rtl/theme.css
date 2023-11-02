@@ -3232,13 +3232,57 @@ input[type="submit"] {
 .page-links .page-numbers,
 .page-links .post-page-numbers {
   display: inline-block;
-  width: 28px;
   height: 28px;
   line-height: 28px;
   text-align: center;
   font-size: 12px;
   border-radius: var(--bb-block-radius-inner);
   padding: 0;
+}
+.bb-bp-invites-content .table-responsive .page-numbers:not(.next, .prev),
+.bb-bp-invites-content .table-responsive .post-page-numbers:not(.next, .prev),
+.bb-lms-pagination .page-numbers:not(.next, .prev),
+.bb-lms-pagination .post-page-numbers:not(.next, .prev),
+.bp-pagination-links .page-numbers:not(.next, .prev),
+.bp-pagination-links .post-page-numbers:not(.next, .prev),
+.bbp-pagination-links .page-numbers:not(.next, .prev),
+.bbp-pagination-links .post-page-numbers:not(.next, .prev),
+.woocommerce-pagination .page-numbers:not(.next, .prev),
+.woocommerce-pagination .post-page-numbers:not(.next, .prev),
+.llms-pagination .page-numbers:not(.next, .prev),
+.llms-pagination .post-page-numbers:not(.next, .prev),
+.page-links .page-numbers:not(.next, .prev),
+.page-links .post-page-numbers:not(.next, .prev) {
+  min-width: 28px;
+}
+.bb-bp-invites-content .table-responsive .page-numbers.next, .bb-bp-invites-content .table-responsive .page-numbers.prev,
+.bb-bp-invites-content .table-responsive .post-page-numbers.next,
+.bb-bp-invites-content .table-responsive .post-page-numbers.prev,
+.bb-lms-pagination .page-numbers.next,
+.bb-lms-pagination .page-numbers.prev,
+.bb-lms-pagination .post-page-numbers.next,
+.bb-lms-pagination .post-page-numbers.prev,
+.bp-pagination-links .page-numbers.next,
+.bp-pagination-links .page-numbers.prev,
+.bp-pagination-links .post-page-numbers.next,
+.bp-pagination-links .post-page-numbers.prev,
+.bbp-pagination-links .page-numbers.next,
+.bbp-pagination-links .page-numbers.prev,
+.bbp-pagination-links .post-page-numbers.next,
+.bbp-pagination-links .post-page-numbers.prev,
+.woocommerce-pagination .page-numbers.next,
+.woocommerce-pagination .page-numbers.prev,
+.woocommerce-pagination .post-page-numbers.next,
+.woocommerce-pagination .post-page-numbers.prev,
+.llms-pagination .page-numbers.next,
+.llms-pagination .page-numbers.prev,
+.llms-pagination .post-page-numbers.next,
+.llms-pagination .post-page-numbers.prev,
+.page-links .page-numbers.next,
+.page-links .page-numbers.prev,
+.page-links .post-page-numbers.next,
+.page-links .post-page-numbers.prev {
+  width: 28px;
 }
 .bb-bp-invites-content .table-responsive a.page-numbers:not(.prev, .next),
 .bb-bp-invites-content .table-responsive a.post-page-numbers,
@@ -5667,9 +5711,11 @@ img.wp-smiley {
   display: inline;
   border: none;
   box-shadow: none;
-  height: 1em;
-  width: 1em;
-  margin: 0 0.07em;
+  /* Use !important to override inline styling */
+  height: 24px !important;
+  width: 24px !important;
+  max-height: initial !important;
+  margin: 3px;
   vertical-align: -0.1em;
   background: none;
   padding: 0;
@@ -11346,13 +11392,6 @@ body:not(.bb-page-loaded) .entry-content .is-type-video iframe {
 .single-attachment .entry-content p {
   margin-bottom: 25px;
 }
-.single-post .entry-content p,
-.single-post .entry-content li,
-.single-attachment .entry-content p,
-.single-attachment .entry-content li {
-  font-size: 14px;
-  line-height: 1.5;
-}
 .single-post .entry-content li > ul,
 .single-post .entry-content li > ol,
 .single-attachment .entry-content li > ul,
@@ -12599,6 +12638,15 @@ figure.wp-block-video video {
 }
 figure.wp-block-video figcaption {
   color: #939597;
+}
+
+.wp-block-image,
+figure.wp-block-video {
+  margin: 0rem 0rem 1.6875rem;
+}
+.wp-block-image .wp-element-caption,
+figure.wp-block-video .wp-element-caption {
+  margin-bottom: inherit;
 }
 
 pre.wp-block-code {
